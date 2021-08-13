@@ -4,11 +4,11 @@ import hashlib
 import gzip
 
 resources = {'labeled': {
-                'url': '', 
+                'url': 'https://uni-bonn.sciebo.de/s/P4OegAJRvktO8wm/download', 
                 'checksum': 'd1fd520c883f971276df847d6eae2533', 
                 'filename': os.path.join('.', 'data', 'labeled.tar.gz')},
              'unlabeled': {
-                 'url': '', 
+                 'url': 'https://uni-bonn.sciebo.de/s/Ydr2c2y6n46RxaW/download', 
                  'checksum': '813248147edb542e6d089a67aa5261ea', 
                  'filename': os.path.join('.', 'data','unlabeled.tar.gz')},
              'dummy': {
@@ -62,6 +62,7 @@ def download_and_unpack(dataset):
         print('everything is fine')
     
 
-download_and_unpack('labeled')
-download_and_unpack('unlabeled')
+if __name__ == "__main__":
+    download_and_unpack('labeled')
+    download_and_unpack('unlabeled')
     
