@@ -14,14 +14,20 @@ resources = {'labeled': {
              'dummy': {
                  'url': 'https://mlai.cs.uni-bonn.de/publications/kalofolias2021-sdm.pdf',
                  'checksum': '196c7665dfe6d86df3b3df72a767267e',
-                 'filename': os.path.join('.', 'data','dummy.pdf')}
+                 'filename': os.path.join('.', 'data','dummy.pdf')},
+             'folder': {
+                 'filename': os.path.join('.', 'data')}
              }
 
 chunk_size = 1024
 
 def _download_data(dataset):
+    '''downloads the data and simultaneously computes the checksum'''
     r = requests.get(resources[dataset]['url'], stream = True)
     h = hashlib.md5()
+
+    if not os.path.exists(resources['folder']['filename']):
+        os.mkdir(resources['folder']['filename'])
 
     with open(resources[dataset]['filename'], 'wb') as f:
         for chunk in r.iter_content(chunk_size):
@@ -54,7 +60,7 @@ def correct_file_exists(dataset):
     return checksum == resources[dataset]['checksum']
         
 
-def download_and_unpack(dataset):
+def download_and_check(dataset):
     if not correct_file_exists(dataset):
         print(f'Downloading data file for dataset {dataset} from {resources[dataset]["url"]}')
         _download_data()
@@ -63,6 +69,6 @@ def download_and_unpack(dataset):
     
 
 if __name__ == "__main__":
-    download_and_unpack('labeled')
-    download_and_unpack('unlabeled')
+    download_and_check('labeled')
+    download_and_check('unlabeled')
     
