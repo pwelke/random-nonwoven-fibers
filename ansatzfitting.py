@@ -56,5 +56,14 @@ def run_fitting(file):
 		   
 		   
 if __name__ == "__main__":
-   run_fitting(sys.argv[1])
-   print("Done!")
+
+	folder = sys.argv[1]
+	
+	# Get all files from that folder
+	files = [f for f in listdir(folder) if isfile(join(folder, f)) and "StressStrainCurve.csv" in f]
+	
+	print(f"Folder = {folder} with {len(files)} Files")
+
+	for file in files:
+		run_fitting(join(folder, file))
+	print("Done!")

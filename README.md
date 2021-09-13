@@ -11,8 +11,8 @@ In particular
 
 ## Usage
 ### Feature generation
-Calculate features for set of graphml files from a folder.
+Calculate graph and stretch features for a set of graphml files from a folder.
 
 ```python feature_generation.py [Folder]``` e.g. ```python feature_generation.py [input_data_labelled]```
 
-Results are placed in ```features/[folder]```
+Results are placed in ```features/[Folder]```
