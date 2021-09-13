@@ -40,3 +40,5 @@ if __name__ == "__main__":
 			Path("features/").mkdir(parents=True, exist_ok=True)
 			print("Starting stretch feature calculation")
 			run(join(folder, file))
+			
+	print("Done!")
