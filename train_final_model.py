@@ -22,10 +22,10 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 def f(x, a, b):
     return (x >= a).astype(int)*(b*((x-a)**2))
 	
-def readGraphFeatures(path):
+def readGraphFeatures(folder):
 
     # Get all the filenames in the directory
-    #path = f"features/"
+    path = f"features/{folder}/"
     files = [f for f in listdir(path) if isfile(join(path, f)) and "_graph" in f]
     
     # Creat empty list
@@ -40,14 +40,16 @@ def readGraphFeatures(path):
     # Combine into dataframe and return
     data_graph = pd.concat(li, axis=0, ignore_index=False)
     data_graph.index = data_graph.index.str.replace("_Microstructure.graphml", "")
+    data_graph.index = data_graph.index.str.replace(folder, '')
+    data_graph.index = data_graph.index.str.replace("\\",'')
     data_graph = data_graph.sort_index()
     
     return data_graph
 	
-def readStretchFeatures(path):
+def readStretchFeatures(folder):
 
     # Get all the filenames in the directory
-    #path = f"features/"
+    path = f"features/{folder}/"
     files = [f for f in listdir(path) if isfile(join(path, f)) and "_stretch" in f]
     
     # Creat empty list
@@ -62,6 +64,8 @@ def readStretchFeatures(path):
     # Combine into dataframe and return
     data_stretch = pd.concat(li, axis=0, ignore_index=False)
     data_stretch.index = data_stretch.index.str.replace("_Microstructure.graphml", "")
+    data_stretch.index = data_graph.index.str.replace(folder, '')
+    data_stretch.index = data_graph.index.str.replace("\\",'')
     data_stretch = data_stretch.sort_index()
     
     return data_stretch
@@ -79,12 +83,15 @@ def readPolyfitTargets(path):
     for f in files:
         file = f"{path}/{f}"
         data = pd.read_csv(file, delimiter=',', encoding='utf-8', index_col = 0)
+        data = data.T
+        data.index = [f]
         li.append(data)
         
     # Combine into dataframe and return
-    data_polyfit = pd.concat(li, axis=0, ignore_index=False)
-    data_polyfit.index = data_polyfit.index.str.replace("_Microstructure.graphml", "")
-    data_polyfit = data_polyfit.sort_index()
+    #data_polyfit = pd.concat(li, axis=0, ignore_index=False)
+    data_polyfit = pd.concat(li, ignore_index=False)
+    data_polyfit.index = data_polyfit.index.str.replace("_StressStrainCurve.csv_polyfit.csv", "")
+    #data_polyfit = data_polyfit.sort_index()
     
     return data_polyfit
 	
@@ -141,29 +148,29 @@ if __name__ == "__main__":
 
 	folder = sys.argv[1]
 	
-	data_graph = readGraphFeatures(f"features/{folder}/")
-	data_stretch = readStretchFeatures(f"features/{folder}/")
+	data_graph = readGraphFeatures(folder)
+	data_stretch = readStretchFeatures(folder)
 	data_polyfit = readPolyfitTargets(f"polyfit/{folder}/")
 	data_joined = combineInputData(data_graph, data_stretch, data_polyfit, deduplicate = True)
 	features = 'graph+stretch'
 	feature_comb = getFeatureCombinations()[features]
 	
-	print(f"Länge von data_polyfit: {len(data_polyfit)}")
-	print(f"data_polyfit: {data_polyfit.columns}")
-	print(data_polyfit)
+	#print(f"Länge von data_polyfit: {len(data_polyfit)}")
+	#print(f"data_polyfit: {data_polyfit.columns}")
+	#print(data_polyfit)
 	
 	final_linreg_alpha, final_linreg_beta = trainFinalModel(data_joined, features = features)
 	
 	# Serialization
-	filename = 'final_linreg_alpha'
+	filename = 'trained_models/pickle_final_linreg_alpha'
 	outfile = open(filename,'wb')
 	pickle.dump(final_linreg_alpha,outfile)
 	outfile.close()
 	
-	filename = 'final_linreg_beta'
+	filename = 'trained_models/pickle_final_linreg_beta'
 	outfile = open(filename,'wb')
 	pickle.dump(final_linreg_beta,outfile)
 	outfile.close()
 	
-	print("Done!")
+	print("Done training models!")
 	

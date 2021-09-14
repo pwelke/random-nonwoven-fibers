@@ -51,7 +51,8 @@ def run_fitting(file):
 	
 	results_df = pd.DataFrame(results)
 	results_df.index = ['alpha', 'beta']
-	results_df.index.name = f"{file}"
+	filename_start = file.rfind('\\')
+	results_df.index.name = f"{file[filename_start + 1:]}"
 	Path("polyfit/").mkdir(parents=True, exist_ok=True)
 	results_df.to_csv(f"polyfit/{file}_polyfit.csv")
 		   
