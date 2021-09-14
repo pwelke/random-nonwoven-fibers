@@ -15,14 +15,14 @@ Calculate graph and stretch features for a set of graphml files from a folder.
 
 ```python feature_generation.py input_data_labelled```
 
-Results are placed in ```features/[Folder]```
+Results are placed in ```features/input_data_labelled```
 
 ### Ansatz fitting
 Calculate alpha, beta the best fitting parameters to a set of given strain-stress curves in a folder.
 
 ```python ansatzfitting.py input_data_labelled```
 
-Results are placed in ```polyfit/[Folder]```
+Results are placed in ```polyfit/input_data_labelled```
 
 ### Training final model
 Train linear regression models for predicting alpha and beta respectively.
