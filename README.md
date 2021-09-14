@@ -13,17 +13,20 @@ In particular
 ### Feature generation
 Calculate graph and stretch features for a set of graphml files from a folder.
 
-```python feature_generation.py [Folder]``` 
-
-e.g. ```python feature_generation.py input_data_labelled```
+```python feature_generation.py input_data_labelled```
 
 Results are placed in ```features/[Folder]```
 
 ### Ansatz fitting
 Calculate alpha, beta the best fitting parameters to a set of given strain-stress curves in a folder.
 
-```python ansatzfitting.py [Folder]``` 
-
-e.g. ```python ansatzfitting.py input_data_labelled```
+```python ansatzfitting.py input_data_labelled```
 
 Results are placed in ```polyfit/[Folder]```
+
+### Training final model
+Train linear regression models for predicting alpha and beta respectively.
+
+```python train_final_model.py input_data_labelled``` 
+
+Results are placed in ```trained_models``` as pickled scikit-learn models.
