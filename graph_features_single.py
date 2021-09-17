@@ -208,12 +208,15 @@ def computeMinCut(G, upper_face_nodes, lower_face_nodes):
 	
 	return len(cut)
 	
-def run_analysis(filename):
+def run_analysis(filename, file=None):
 	
 	results = {}
 
+	if file is None:
+		file = filename
+
 	""" Import graph """
-	G = fileImportToNetworkX(filename)
+	G = fileImportToNetworkX(file)
 	#print(f"Graph imported from {filename}")
 
 	#""" Extract parameters from filename """
