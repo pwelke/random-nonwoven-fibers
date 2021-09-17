@@ -6,11 +6,11 @@ import gzip
 resources = {'labeled': {
                 'url': 'https://uni-bonn.sciebo.de/s/P4OegAJRvktO8wm/download', 
                 'checksum': 'd1fd520c883f971276df847d6eae2533', 
-                'filename': os.path.join('.', 'data', 'labeled.tar.gz')},
+                'filename': os.path.join('.', 'labeled.tar.gz')},
              'unlabeled': {
                  'url': 'https://uni-bonn.sciebo.de/s/Ydr2c2y6n46RxaW/download', 
                  'checksum': '813248147edb542e6d089a67aa5261ea', 
-                 'filename': os.path.join('.', 'data','unlabeled.tar.gz')},
+                 'filename': os.path.join('.','unlabeled.tar.gz')},
              'dummy': {
                  'url': 'https://mlai.cs.uni-bonn.de/publications/kalofolias2021-sdm.pdf',
                  'checksum': '196c7665dfe6d86df3b3df72a767267e',
@@ -63,7 +63,7 @@ def correct_file_exists(dataset):
 def download_and_check(dataset):
     if not correct_file_exists(dataset):
         print(f'Downloading data file for dataset {dataset} from {resources[dataset]["url"]}')
-        _download_data()
+        _download_data(dataset)
     else:
         print('everything is fine')
     
