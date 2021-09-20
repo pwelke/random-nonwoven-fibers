@@ -1,0 +1,13 @@
+name: nwf-stretch
+channels:
+  - defaults
+dependencies:
+  - networkx=2.6
+  - numpy=1.19.2
+  - python=3.8
+  - scipy
+  - pandas
+  - matplotlib
+  - tqdm
+  - scikit-learn
+  - requests

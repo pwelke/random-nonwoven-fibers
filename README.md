@@ -2,6 +2,14 @@
 Code for the paper "Graph-Based Tensile Strength Approximation of Random Nonwoven Materials by Interpretable Regression"
 
 
+## Dependencies
+All packages that we depend on are listed in ```environment.yaml```. 
+You may create a virtual environment e.g. using [anaconda](https://anaconda.org) via the command
+
+```conda env create -n nwf-stretch -f environment.yaml```
+
+After activating the environment, you can follow the steps below.
+
 ## Dataset
 You may download the datasets used for our experiments using ```download_data.py```. 
 It downloads two (large) archives to the base folder of the repository.
