@@ -208,7 +208,7 @@ def computeMinCut(G, upper_face_nodes, lower_face_nodes):
 	
 	return len(cut)
 	
-def run_analysis(filename, file=None):
+def compute_standard_graph_features(filename, file=None):
 	
 	results = {}
 
@@ -275,5 +275,5 @@ def run_analysis(filename, file=None):
 	   
 
 if __name__ == "__main__":
-   run_analysis(sys.argv[1])
+   compute_standard_graph_features(sys.argv[1])
    print("Done!")

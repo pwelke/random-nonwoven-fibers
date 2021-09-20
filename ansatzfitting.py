@@ -17,7 +17,7 @@ def f(x, a, b):
     #print(f"Called with xdata:{x}, alpha:{a}, beta:{b}")
     return (x >= a).astype(int)*(b*((x-a)**2))
 	
-def run_fitting(filename, fileobject):
+def fit_ansatz_function(filename, fileobject):
 
 	if fileobject is None:
 		fileobject = filename
@@ -58,7 +58,7 @@ if __name__ == "__main__":
 			for tarinfo in tarredfiles:
 				if tarinfo.isreg() and "StressStrainCurve.csv" in tarinfo.name:
 					tarredfiles.extract(tarinfo)
-					run_fitting(join(folder, tarinfo.name), tarinfo.name)
+					fit_ansatz_function(join(folder, tarinfo.name), tarinfo.name)
 					remove(tarinfo.name)
 	else:
 		# Get all files from that folder
@@ -68,5 +68,5 @@ if __name__ == "__main__":
 		print(f"Folder = {folder} with {len(files)} Files")
 
 		for file in files:
-			run_fitting(join(folder, file), join(folder, file))
+			fit_ansatz_function(join(folder, file), join(folder, file))
 		print("Done!")

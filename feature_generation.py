@@ -6,10 +6,10 @@ import sys, getopt
 from pathlib import Path
 import tarfile
 
-from graph_features_single import run_analysis
-from stretch import run
+from graph_features_single import compute_standard_graph_features, fileImportToNetworkX
+from stretch import compute_stretch_graph_features
 
-def process_file(filename, file):
+def compute_all_graph_features(filename, file):
 
 	if file is None:
 		file = filename
@@ -22,7 +22,7 @@ def process_file(filename, file):
 	else:
 		Path("features/").mkdir(parents=True, exist_ok=True)
 		print(f"Graph feature calculation for {filename}")
-		run_analysis(filename, file)
+		compute_standard_graph_features(filename, file)
 
 	# Calculate stretch features
 
@@ -33,7 +33,8 @@ def process_file(filename, file):
 	else:
 		Path("features/").mkdir(parents=True, exist_ok=True)
 		print(f'Stretch feature calculation for {filename}')
-		run(filename, file)
+		compute_stretch_graph_features(filename, file)
+
 
 if __name__ == "__main__":
 		
@@ -58,7 +59,7 @@ if __name__ == "__main__":
 			mkdir(join('features', folder))
 				
 		for filename in files:
-			process_file(filename=join(folder, filename), file=None)
+			compute_all_graph_features(filename=join(folder, filename), file=None)
 				
 		print("Done!")
 
@@ -70,6 +71,6 @@ if __name__ == "__main__":
 						# have a folder called like the tarfile and a file named after the current file in the tarfile
 						# content of tarfile is streamed
 						tarredfiles.extract(tarinfo)
-						process_file(filename=join(folder, tarinfo.name), file=tarinfo.name)
+						compute_all_graph_features(filename=join(folder, tarinfo.name), file=tarinfo.name)
 						remove(tarinfo.name)
 						

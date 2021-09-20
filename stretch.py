@@ -342,7 +342,7 @@ def main(file: str='2020_08_12_KAPPA0p0003_A0p15_B0p25_Sample001_RedFibStruc.gra
     return get_features(processed_positions, original_positions)
 
 
-def run(filename, file):
+def compute_stretch_graph_features(filename, file):
     results = {}
     #factors = [1.05, 1.1]
     factors = [1.05, 1.1, 1.15, 1.2, 1.25, 1.3, 1.35, 1.4, 1.45, 1.5]
@@ -375,5 +375,5 @@ def run(filename, file):
 
 
 if __name__ == "__main__":
-   run(sys.argv[1])
+   compute_stretch_graph_features(sys.argv[1])
    print("Done!")
