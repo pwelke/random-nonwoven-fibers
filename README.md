@@ -27,9 +27,15 @@ Results are placed in ```features/``` with a subfolder corresponding to the fold
 ### Ansatz fitting
 Calculate alpha, beta the best fitting parameters to a set of given strain-stress curves in a folder.
 
+Folder:
 ```python ansatzfitting.py input_data_labelled```
 
-Results are placed in ```polyfit/input_data_labelled```
+File:
+```python ansatzfitting.py -f nonwoven-fiber-graphs_labeled.tar.gz```
+```python ansatzfitting.py -f nonwoven-fiber-graphs_unlabeled.tar.gz```
+
+Results are placed in ```polyfit/``` with a subfolder corresponding to the folder/filename. 
+!!! Please note, only folders/files in the base directory of this repository work. Please consider creating a symlink if you have to store the data somewhere else !!! 
 
 ### Training final model
 Train linear regression models for predicting alpha and beta respectively.
