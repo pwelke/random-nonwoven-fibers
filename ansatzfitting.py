@@ -1,34 +1,12 @@
 # Data related libraries
-import numpy as np
 import pandas as pd
 from scipy.optimize import curve_fit
-from scipy import stats
 
-# Network
-import networkx as nx
-from networkx.algorithms import bipartite
-
-# Plotting
-import matplotlib.pyplot as plt
-from ipywidgets import interact, fixed
-from IPython.display import display, HTML
-
-# Convenient helpers
-import csv
-import math
-import re
-from copy import copy
-from time import time
-from datetime import date
-from tqdm import tqdm
-from collections import defaultdict, Counter
-from sklearn.preprocessing import minmax_scale
-from sklearn.metrics import r2_score
-
-from os import listdir
-from os.path import isfile, join
+from os import listdir, mkdir, remove
+from os.path import isfile, join, exists
 from pathlib import Path
-import sys, getopt
+import sys
+import tarfile
 
 # Printing libraries and settings
 # import warnings; warnings.filterwarnings('ignore')
@@ -39,8 +17,12 @@ def f(x, a, b):
     #print(f"Called with xdata:{x}, alpha:{a}, beta:{b}")
     return (x >= a).astype(int)*(b*((x-a)**2))
 	
-def run_fitting(file):
-	data = pd.read_csv(file, delimiter=',', encoding='utf-8')
+def run_fitting(filename, fileobject):
+
+	if fileobject is None:
+		fileobject = filename
+
+	data = pd.read_csv(fileobject, delimiter=',', encoding='utf-8')
 	
 	popt, pcov = curve_fit(f, 
 						xdata = data.Strain.values, 
@@ -51,21 +33,40 @@ def run_fitting(file):
 	
 	results_df = pd.DataFrame(results)
 	results_df.index = ['alpha', 'beta']
-	filename_start = file.rfind('\\')
-	results_df.index.name = f"{file[filename_start + 1:]}"
+	filename_start = filename.rfind('\\')
+	results_df.index.name = f"{filename[filename_start + 1:]}"
 	Path("polyfit/").mkdir(parents=True, exist_ok=True)
-	results_df.to_csv(f"polyfit/{file}_polyfit.csv")
+	results_df.to_csv(join('polyfit', f"{filename}_polyfit.csv"))
 		   
 		   
 if __name__ == "__main__":
 
 	folder = sys.argv[1]
-	
-	# Get all files from that folder
-	files = [f for f in listdir(folder) if isfile(join(folder, f)) and "StressStrainCurve.csv" in f]
-	
-	print(f"Folder = {folder} with {len(files)} Files")
 
-	for file in files:
-		run_fitting(join(folder, file))
-	print("Done!")
+	if folder == '-f':
+		zipping = True
+		folder = sys.argv[2]
+	else:
+		zipping = False
+
+	# create output folder if necessary
+	if not exists(join('polyfit', folder)):
+		mkdir(join('polyfit', folder))
+
+	if zipping:
+		with tarfile.open(folder, 'r:*') as tarredfiles:
+			for tarinfo in tarredfiles:
+				if tarinfo.isreg() and "StressStrainCurve.csv" in tarinfo.name:
+					tarredfiles.extract(tarinfo)
+					run_fitting(join(folder, tarinfo.name), tarinfo.name)
+					remove(tarinfo.name)
+	else:
+		# Get all files from that folder
+		files = [f for f in listdir(folder) if isfile(
+		    join(folder, f)) and "StressStrainCurve.csv" in f]
+
+		print(f"Folder = {folder} with {len(files)} Files")
+
+		for file in files:
+			run_fitting(join(folder, file), join(folder, file))
+		print("Done!")
