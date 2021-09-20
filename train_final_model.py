@@ -1,22 +1,16 @@
 # Data related libraries
-import numpy as np
 import pandas as pd
 
 # System
 from os import listdir
 from os.path import isfile, join
-import sys, getopt
-from pathlib import Path
+import sys
 
 # Persistance
 import pickle
 
 # Modeling
-from sklearn.preprocessing import minmax_scale, StandardScaler, MinMaxScaler
-from sklearn import preprocessing, linear_model
-from sklearn.linear_model import LinearRegression, Lasso
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+from sklearn.linear_model import LinearRegression
 
 # Ansatz function
 def f(x, a, b):
@@ -137,7 +131,6 @@ def trainFinalModel(data_joined, features):
     """
 
     feature_comb = getFeatureCombinations()[features]
-    df_predictions = []
     
     final_linreg_alpha = LinearRegression().fit(data_joined[feature_comb], data_joined['alpha'])
     final_linreg_beta = LinearRegression().fit(data_joined[feature_comb], data_joined['beta'])
