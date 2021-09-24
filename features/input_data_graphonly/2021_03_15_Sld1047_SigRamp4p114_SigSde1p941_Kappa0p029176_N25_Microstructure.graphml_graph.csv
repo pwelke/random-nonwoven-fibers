@@ -1,0 +1,2 @@
+,kappa,sigRamp,sigSde,sld,n_nodes,n_edges,max_degree,length_sum,n_upper_face,n_lower_face,min_dist,min_weight_dist,min_eucl_dist,diff_eucl_length_mean,diff_eucl_length_median,diff_eucl_length_sum,min_cut_size
+input_data_graphonly\2021_03_15_Sld1047_SigRamp4p114_SigSde1p941_Kappa0p029176_N25_Microstructure.graphml,0.029176,4.114,1.941,1047,47765,161960,147,9774.153874300098,56,55,99,7.932389000000001,7.793654100047791,0.002464233119338548,1.274014119521244e-05,399.1071960080712,55

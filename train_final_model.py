@@ -109,6 +109,9 @@ def combineInputData(data_graph, data_stretch, data_polyfit, deduplicate = True)
     return data_joined
 	
 def getFeatureCombinations():
+	"""
+	This function groups the columns into feature sets togeter and returns a dict
+	"""
     param_features = ["kappa", "sigRamp", "sigSde", "sld"]
     graph_features = list(data_graph.columns[4:])
     stretch_features = list(data_stretch.columns)
