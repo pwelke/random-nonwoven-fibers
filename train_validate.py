@@ -11,6 +11,11 @@ from pathlib import Path
 # Persistance
 import pickle
 
+# Validation
+import ot
+import ot.plot
+from bisect import bisect_left
+
 # Modeling
 from sklearn.preprocessing import minmax_scale, StandardScaler, MinMaxScaler
 from sklearn import preprocessing, linear_model
@@ -210,7 +215,7 @@ def trainFinalModel(data_joined, features):
             
     return final_linreg_alpha, final_linreg_beta
 	
-def train_validate(data_joined, df_graphonly):
+def train(data_joined, df_graphonly):
 	"""
 	This function takes the labelled and unlabelled data and performs a k-fold cross-validation of linear regression training and testing, where k is the number of parameter combinations within the labelled data
 	"""
@@ -373,7 +378,235 @@ def train_validate(data_joined, df_graphonly):
 									'predictions':df_predictions})
 									
 	print(f"LOG: Number of trained models: {len(trained_models)}")
+	return df_predictions
 	
+# Validation
+def take_closest(myList, myNumber):
+    """
+    Assumes myList is sorted. Returns closest value to myNumber.
+
+    If two numbers are equally close, return the smallest number.
+    """
+    pos = bisect_left(myList, myNumber)
+    if pos == 0:
+        return myList[0]
+    if pos == len(myList):
+        return myList[-1]
+    before = myList[pos - 1]
+    after = myList[pos]
+    if after - myNumber < myNumber - before:
+       return after
+    else:
+       return before
+	   
+def resampleCurve(curve, n_base_points = 1000):
+    
+    base_points = np.linspace(start = 0, stop = 0.5, num = n_base_points, endpoint = True)
+    
+    resampled_curve = []
+    original_curve = list(curve.index)
+
+    # Search for nearest original base points to our newly chosen base points
+    for point in base_points:
+        closest = closest = take_closest(original_curve, point)
+        resampled_curve.append(float(curve.loc[closest]))
+        
+    return base_points, resampled_curve
+	
+def getResamplesOrigPredCurves(df_predictions, test_data, n_base_points = 1000):
+    orig_curves_resampled = []
+    pred_curves_resampled = []
+
+    base_points = np.linspace(start = 0, stop = 0.5, num = n_base_points, endpoint = True)
+
+    for sample in df_predictions.index:
+        # Read in original data
+        for folder in ["Batch_28_01_2021", "Batch_25_02_2021", "Batch_15_02_2021", "Batch_02_03_2021", "Batch_20_03_2021"]:
+            my_file = Path(f"../data/{folder}/{sample}_StressStrainCurve.csv")
+            if my_file.is_file():
+                df_original = pd.read_csv(my_file, index_col = 0)
+                break
+
+        # Calculate predicted values
+        pred_alpha = df_predictions.loc[sample, "predicted_alpha_linreg"]
+        pred_beta = df_predictions.loc[sample, "predicted_beta_linreg"]
+        predicted_curve = pd.Series(data = f(base_points, pred_alpha, pred_beta), index = base_points)
+
+        # Resample
+        base_points, orig_curve_resampled = resampleCurve(df_original.Stress, n_base_points = n_base_points)
+        base_points, pred_curve_resampled = resampleCurve(predicted_curve, n_base_points = n_base_points)
+        orig_curves_resampled.append(pd.Series(data = orig_curve_resampled, index = base_points))
+        pred_curves_resampled.append(pd.Series(data = pred_curve_resampled, index = base_points))
+
+        #print(f"LOG: len of orig = {len(df_original)}, len of pred = {len(predicted_curve)}")
+        
+    return base_points, orig_curves_resampled, pred_curves_resampled
+	
+def getResamplesOrigPredCurvesSingleSample(df_predictions, test_data, fix_param, n_base_points = 1000):
+    orig_curves_resampled = []
+    pred_curves_resampled = []
+
+    base_points = np.linspace(start = 0, stop = 0.5, num = n_base_points, endpoint = True)
+
+    
+    # Read in original sample
+    orig_sample_df = getParamCombData(data_joined, fix_param)
+    orig_sample = orig_sample_df.index[0]
+    print(f"LOG: samples = {len(orig_sample_df)}")
+    # Read in original data
+    for folder in ["Batch_28_01_2021", "Batch_25_02_2021", "Batch_15_02_2021", "Batch_02_03_2021", "Batch_20_03_2021"]:
+        my_file = Path(f"../data/{folder}/{orig_sample}_StressStrainCurve.csv")
+        if my_file.is_file():
+            df_original = pd.read_csv(my_file, index_col = 0)
+            break
+            
+    base_points, orig_curve_resampled = resampleCurve(df_original.Stress, n_base_points = n_base_points)
+    orig_curves_resampled.append(pd.Series(data = orig_curve_resampled, index = base_points))
+    
+    for sample in df_predictions.index:
+        # Calculate predicted values
+        pred_alpha = df_predictions.loc[sample, "predicted_alpha_linreg"]
+        pred_beta = df_predictions.loc[sample, "predicted_beta_linreg"]
+        predicted_curve = pd.Series(data = f(base_points, pred_alpha, pred_beta), index = base_points)
+
+        # Resample
+        base_points, pred_curve_resampled = resampleCurve(predicted_curve, n_base_points = n_base_points)
+        pred_curves_resampled.append(pd.Series(data = pred_curve_resampled, index = base_points))
+
+        #print(f"LOG: len of orig = {len(df_original)}, len of pred = {len(predicted_curve)}")
+        
+    return base_points, orig_curves_resampled, pred_curves_resampled
+	
+def calculateMeanStd(orig_curves_resampled, pred_curves_resampled):
+    orig_mean, orig_std = [], []
+    pred_mean, pred_std = [], []
+
+    for j in range(len(orig_curves_resampled[0])):
+        orig_mean.append(np.mean([x.values[j] for x in orig_curves_resampled]))
+        orig_std.append(np.std([x.values[j] for x in orig_curves_resampled]))
+
+    for j in range(len(orig_curves_resampled[0])):
+        pred_mean.append(np.mean([x.values[j] for x in pred_curves_resampled]))
+        pred_std.append(np.std([x.values[j] for x in pred_curves_resampled]))
+        
+    return orig_mean, orig_std, pred_mean, pred_std
+	
+# Plotting
+def plotOrigPredCurve(k, base_points, orig_mean, orig_std, pred_mean, pred_std, single):
+    fig = plt.figure()
+    fig.set_size_inches(4,3)
+    
+    lower_std_orig = [x + y for x,y in zip(orig_mean, orig_std)]
+    upper_std_orig = [x - y for x,y in zip(orig_mean, orig_std)]
+    lower_std_pred = [x + y for x,y in zip(pred_mean, pred_std)]
+    upper_std_pred = [x - y for x,y in zip(pred_mean, pred_std)]
+
+    plt.xlabel("Strain")
+    plt.ylabel("Stress")
+
+    if single == False:
+        plt.plot(base_points, orig_mean, lw = 2, color = "red", label = "True mean", linestyle='dashed')
+        plt.fill_between(base_points, lower_std_orig, upper_std_orig, color = "red", alpha = 0.3, label = "True std")
+
+        plt.plot(base_points, pred_mean, lw = 2, color = "blue", label = "Pred mean", linestyle='dashed')
+        plt.fill_between(base_points, lower_std_pred, upper_std_pred, color = "blue", alpha = 0.3, label = "Pred std")
+        
+    else:
+        plt.plot(base_points, orig_mean, lw = 2, color = "red", label = "True sample", linestyle='dashed')
+
+        plt.plot(base_points, pred_mean, lw = 2, color = "blue", label = "Pred mean", linestyle='dashed')
+        plt.fill_between(base_points, lower_std_pred, upper_std_pred, color = "blue", alpha = 0.3, label = "Pred std")
+
+    plt.legend(loc = "upper left")
+    plt.tight_layout()
+    #plt.savefig(f"../visuals/2021.03.15_graph_stretch/{date.today()}_Nr_{k}.pdf")
+    #plt.show()
+	
+# Optimal Transport
+def getHighDimOTLoss(xs, xt):
+    n = len(xs)
+    a, b = np.ones((n,)) / n, np.ones((n,)) / n  # uniform distribution on samples
+
+    # loss matrix
+    M = ot.dist(xs, xt, metric = "euclidean")
+    #M /= M.max()
+    
+    # Calculate optimal mapping
+    #optimal_mapping = ot.emd(a, b, M)
+    #optimal_mapping = ot.emd(a = [], b = [], M = M)
+    
+    # Calculate optimization loss
+    optimal_loss = ot.emd2(a, b, M)
+        
+    #return optimal_loss, optimal_mapping, M
+    return optimal_loss
+	
+# Baseline
+def getBaseline(base_points, fix_param):
+    para_combs = getParamCombinations(data_joined)
+    train_para_combs = [x for x in para_combs if x != fix_param]
+    data = getMultipleParamCombData(data_joined, train_para_combs)
+    mean_alpha = np.mean(data.alpha)
+    mean_beta = np.mean(data.beta)
+    baseline_curve = pd.Series(data = f(base_points, mean_alpha, mean_beta), index = base_points)
+
+    return baseline_curve
+	
+def validate():
+	plot = False
+	ot_loss_sum = 0
+	r2_losses = []
+	baseline_r2_loss = []
+	base_points = np.linspace(start = 0, stop = 0.5, num = 1000, endpoint = True)
+	for k in range(len(predictions)):
+		
+		prediction = predictions[k]
+		feature_comb = prediction['feature_comb']
+		fix_param = prediction['fix_param']
+		df_predictions = prediction['predictions']
+		test_data = getParamCombData(data_joined, fix_param)
+		
+		print(f"LOG: fix_param = {fix_param}")
+		
+		# Get Baseline
+		baseline_curve = getBaseline(base_points, fix_param)
+		
+		if len(getParamCombData(df_graphonly, fix_param)) == 0:
+			#print("LOG: Fall 1")
+		
+			# Resample
+			base_points, orig_curves_resampled, pred_curves_resampled = getResamplesOrigPredCurves(df_predictions, test_data)
+			orig_mean, orig_std, pred_mean, pred_std = calculateMeanStd(orig_curves_resampled, pred_curves_resampled)
+			
+			# Plot
+			if plot:
+				plotOrigPredCurve(k, base_points, orig_mean, orig_std, pred_mean, pred_std, single = False)
+
+			# Calculate Optimal transport loss
+			ot_loss = getHighDimOTLoss(np.array(orig_curves_resampled), np.array(pred_curves_resampled))
+			ot_loss_sum += ot_loss
+
+			#print(f"LOG: n_samples: {len(df_predictions)}")
+			#print(f"LOG: Optimal Transport Loss: {ot_loss:.2f}")
+			
+		else:
+			# Resample
+			base_points, orig_curves_resampled, pred_curves_resampled = getResamplesOrigPredCurvesSingleSample(df_predictions, test_data, fix_param)
+			orig_mean, orig_std, pred_mean, pred_std = calculateMeanStd(orig_curves_resampled, pred_curves_resampled)
+
+			# Plot
+			if plot:
+				plotOrigPredCurve(k, base_points, orig_mean, orig_std, pred_mean, pred_std, single = True)
+			
+		# Calculate R2 loss
+		r2_losses.append(r2_score(orig_mean, pred_mean))
+		baseline_r2_loss.append(r2_score(orig_mean, baseline_curve))
+		#print(f"LOG: R^2: {r2_score(orig_mean, pred_mean)}")
+		
+	print(f"Sum of OT_Losses: {ot_loss_sum}")
+	print(f"LOG: Median R^2 across param combs: {np.median(r2_losses)}")
+	
+# Main
 if __name__ == "__main__":
 
 	folder = sys.argv[1]
@@ -400,7 +633,9 @@ if __name__ == "__main__":
 	#print(f"data_polyfit: {data_polyfit.columns}")
 	#print(data_polyfit)
 	
-	train_validate(data_joined, data_graphonly)
+	train(data_joined, data_graphonly)
+	
+	validate()
 	
 	#final_linreg_alpha, final_linreg_beta = trainFinalModel(data_joined, features = features)
 	
