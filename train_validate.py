@@ -33,7 +33,7 @@ def getAdjR2(r2, n, p):
 def readGraphFeatures(folder):
 
     # Get all the filenames in the directory
-    path = f"features/{folder}/"
+    path = join("features", folder)
     files = [f for f in listdir(path) if isfile(join(path, f)) and "_graph" in f]
     
     # Creat empty list
@@ -41,7 +41,7 @@ def readGraphFeatures(folder):
     
     # Iterate over files
     for f in files:
-        file = f"{path}/{f}"
+        file = join(path, f)
         data = pd.read_csv(file, delimiter=',', encoding='utf-8', index_col = 0)
         li.append(data)
         
@@ -57,7 +57,7 @@ def readGraphFeatures(folder):
 def readStretchFeatures(folder):
 
     # Get all the filenames in the directory
-    path = f"features/{folder}/"
+    path = join("features", folder)
     files = [f for f in listdir(path) if isfile(join(path, f)) and "_stretch" in f]
     
     # Creat empty list
@@ -65,7 +65,7 @@ def readStretchFeatures(folder):
     
     # Iterate over files
     for f in files:
-        file = f"{path}/{f}"
+        file = join(path, f)
         data = pd.read_csv(file, delimiter=',', encoding='utf-8', index_col = 0)
         li.append(data)
         
@@ -89,7 +89,7 @@ def readPolyfitTargets(path):
     
     # Iterate over files
     for f in files:
-        file = f"{path}/{f}"
+        file = join(path, f)
         data = pd.read_csv(file, delimiter=',', encoding='utf-8', index_col = 0)
         data = data.T
         data.index = [f]
@@ -125,15 +125,15 @@ def combineInputData(data_graph, data_stretch, data_polyfit, deduplicate = True)
 def readGraphOnlyData(folder):
 
     # Get all the filenames in the directory
-    path = f"features/{folder}/"
+    path = join("features", folder)
     files = [f for f in listdir(path) if isfile(join(path, f)) and "_graph" in f]
     
-    # Creat empty list
     li = []
     
     # Iterate over files
     for f in files:
-        file = f"{path}/{f}"
+        file = join(path, f)
+        #file = f"{path}/{f}"
         data = pd.read_csv(file, delimiter=',', encoding='utf-8', index_col = 0)
         li.append(data)
         
@@ -423,9 +423,10 @@ def getResamplesOrigPredCurves(folder, df_predictions, test_data, n_base_points 
     for sample in df_predictions.index:
         # Read in original data
         #print(f"LOG: function getResamplesOrigPredCurves, sample = {sample}")
-        #for folder in ["Batch_28_01_2021", "Batch_25_02_2021", "Batch_15_02_2021", "Batch_02_03_2021", "Batch_20_03_2021"]:
-		
-        my_file = Path(f"{folder}/{sample}_StressStrainCurve.csv")
+        
+        my_file_path = join(folder, sample)
+        my_file = Path(f"{my_file_path}_StressStrainCurve.csv")
+        #my_file = Path(f"{folder}/{sample}_StressStrainCurve.csv")
         #print(f"LOG: my_file = {my_file}")
         if my_file.is_file():
             df_original = pd.read_csv(my_file, index_col = 0)
@@ -612,50 +613,49 @@ def validate(folder, predictions, df_graphonly):
 # Main
 if __name__ == "__main__":
 
-	folder = sys.argv[1]
-	folder_graphonly = sys.argv[2]
-	
-	# Read data in
-	data_graph = readGraphFeatures(folder)
-	data_stretch = readStretchFeatures(folder)
-	data_polyfit = readPolyfitTargets(f"polyfit/{folder}/")
-	data_joined = combineInputData(data_graph, data_stretch, data_polyfit, deduplicate = True)
-	data_graphonly = readGraphOnlyData(folder_graphonly)
-	
-	# Features
-	features = 'graph+stretch'
-	feature_comb = getFeatureCombinations()[features]
-	
-	# Parameters
-	para_combs = getParamCombinations(data_joined)
-	
-	# Logging
-	print(f"#Labelled: {len(data_graph)}, #unlabelled: {len(data_graphonly)}")
-	
-	#print(f"Länge von data_polyfit: {len(data_polyfit)}")
-	#print(f"data_polyfit: {data_polyfit.columns}")
-	#print(data_polyfit)
-	
-	# Train the models
-	predictions = train(data_joined, data_graphonly)
+    folder = sys.argv[1]
+    folder_graphonly = sys.argv[2]
+    
+    # Read data in
+    data_graph = readGraphFeatures(folder)
+    data_stretch = readStretchFeatures(folder)
+    polyfit_path = join("polyfit", folder)
+    data_polyfit = readPolyfitTargets(polyfit_path)
+    data_joined = combineInputData(data_graph, data_stretch, data_polyfit, deduplicate = True)
+    data_graphonly = readGraphOnlyData(folder_graphonly)
+    
+    # Features
+    features = 'graph+stretch'
+    feature_comb = getFeatureCombinations()[features]
+    
+    # Parameters
+    para_combs = getParamCombinations(data_joined)
+    
+    # Logging
+    print(f"#Labelled: {len(data_graph)}, #unlabelled: {len(data_graphonly)}")
+    
+    #print(f"Länge von data_polyfit: {len(data_polyfit)}")
+    #print(f"data_polyfit: {data_polyfit.columns}")
+    #print(data_polyfit)
+    
+    # Train the models
+    predictions = train(data_joined, data_graphonly)
     print("Done training models!")
 
-	# Validate the trained models
-	validate(folder, predictions, data_graphonly)
-	print("Done validating models!")
-	
-	#final_linreg_alpha, final_linreg_beta = trainFinalModel(data_joined, features = features)
-	
-	# Serialization
-	#filename = 'trained_models/pickle_final_linreg_alpha'
-	#outfile = open(filename,'wb')
-	#pickle.dump(final_linreg_alpha,outfile)
-	#outfile.close()
-	#
-	#filename = 'trained_models/pickle_final_linreg_beta'
-	#outfile = open(filename,'wb')
-	#pickle.dump(final_linreg_beta,outfile)
-	#outfile.close()
-	
-
-	
+    # Validate the trained models
+    validate(folder, predictions, data_graphonly)
+    print("Done validating models!")
+    
+    #final_linreg_alpha, final_linreg_beta = trainFinalModel(data_joined, features = features)
+    
+    # Serialization
+    #filename = 'trained_models/pickle_final_linreg_alpha'
+    #outfile = open(filename,'wb')
+    #pickle.dump(final_linreg_alpha,outfile)
+    #outfile.close()
+    #
+    #filename = 'trained_models/pickle_final_linreg_beta'
+    #outfile = open(filename,'wb')
+    #pickle.dump(final_linreg_beta,outfile)
+    #outfile.close()
+    
