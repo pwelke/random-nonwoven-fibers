@@ -7,9 +7,15 @@ from os import listdir
 from os.path import isfile, join
 import sys, getopt
 from pathlib import Path
+from datetime import date
 
 # Persistance
 import pickle
+
+# Plotting
+import matplotlib.pyplot as plt
+#from ipywidgets import interact, fixed
+#from IPython.display import display, HTML
 
 # Validation
 import ot
@@ -133,7 +139,6 @@ def readGraphOnlyData(folder):
     # Iterate over files
     for f in files:
         file = join(path, f)
-        #file = f"{path}/{f}"
         data = pd.read_csv(file, delimiter=',', encoding='utf-8', index_col = 0)
         li.append(data)
         
@@ -523,7 +528,9 @@ def plotOrigPredCurve(k, base_points, orig_mean, orig_std, pred_mean, pred_std, 
 
     plt.legend(loc = "upper left")
     plt.tight_layout()
-    #plt.savefig(f"../visuals/2021.03.15_graph_stretch/{date.today()}_Nr_{k}.pdf")
+    fig_path = join("visuals", f"{date.today()}_Nr_{k}.pdf")
+    plt.savefig(fig_path)
+    #plt.savefig(f"visuals/2021.03.15_graph_stretch/{date.today()}_Nr_{k}.pdf")
     #plt.show()
 	
 # Optimal Transport
@@ -556,8 +563,8 @@ def getBaseline(base_points, fix_param):
 
     return baseline_curve
 	
-def validate(folder, predictions, df_graphonly):
-	plot = False
+def validate(folder, predictions, df_graphonly, plot = False):
+	#plot = False
 	ot_loss_sum = 0
 	r2_losses = []
 	baseline_r2_loss = []
@@ -608,13 +615,32 @@ def validate(folder, predictions, df_graphonly):
 		#print(f"LOG: R^2: {r2_score(orig_mean, pred_mean)}")
 		
 	#print(f"Sum of OT_Losses: {ot_loss_sum}")
-	print(f"LOG: Median R^2 across param combs: {np.median(r2_losses)}")
+	print(f"LOG: Median R^2 across param combs: {np.median(r2_losses):.3f}")
 	
 # Main
 if __name__ == "__main__":
 
+    # Read in arguments from command line
     folder = sys.argv[1]
     folder_graphonly = sys.argv[2]
+    
+    # Get full command-line arguments
+    full_cmd_arguments = sys.argv
+    
+    # Keep all but the first
+    argument_list = full_cmd_arguments[1:]
+	
+    print(argument_list)
+    
+    short_options = "p"
+    long_options = ["plot"]
+        
+    # Evaluate given options
+    plot = False
+    for current_argument in argument_list:
+        if current_argument in ("-p", "--plot"):
+            print ("Enabling plotting mode")
+            plot = True
     
     # Read data in
     data_graph = readGraphFeatures(folder)
@@ -643,7 +669,7 @@ if __name__ == "__main__":
     print("Done training models!")
 
     # Validate the trained models
-    validate(folder, predictions, data_graphonly)
+    validate(folder, predictions, data_graphonly, plot = plot)
     print("Done validating models!")
     
     #final_linreg_alpha, final_linreg_beta = trainFinalModel(data_joined, features = features)
