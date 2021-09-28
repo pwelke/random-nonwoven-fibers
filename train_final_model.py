@@ -1,3 +1,4 @@
+## Imports
 # Data related libraries
 import pandas as pd
 
@@ -14,10 +15,15 @@ from sklearn.linear_model import LinearRegression
 
 # Ansatz function
 def f(x, a, b):
+    """
+    Constant-quadratic ansatz-function with two parameters
+    """
     return (x >= a).astype(int)*(b*((x-a)**2))
 	
 def readGraphFeatures(folder):
-
+    """
+    Reads in calculated graph features placed in 'folder'
+    """
     # Get all the filenames in the directory
     path = join("features", folder)
     files = [f for f in listdir(path) if isfile(join(path, f)) and "_graph" in f]
@@ -41,7 +47,9 @@ def readGraphFeatures(folder):
     return data_graph
 	
 def readStretchFeatures(folder):
-
+    """
+    Reads in calculated stretch features placed in 'folder'
+    """
     # Get all the filenames in the directory
     path = join("features", folder)
     files = [f for f in listdir(path) if isfile(join(path, f)) and "_stretch" in f]
@@ -65,7 +73,9 @@ def readStretchFeatures(folder):
     return data_stretch
 	
 def readPolyfitTargets(path):
-
+    """
+    Reads in alpha, beta targets based on the ansatzfitting from 'path'
+    """
     # Get all the filenames in the directory
     #path = f"labels/"
     files = [f for f in listdir(path) if isfile(join(path, f)) and "_polyfit" in f]
@@ -90,6 +100,9 @@ def readPolyfitTargets(path):
     return data_polyfit
 	
 def combineInputData(data_graph, data_stretch, data_polyfit, deduplicate = True):
+    """
+    Combines the read in data into a single dataframe
+    """
     # Check if same samples inside both
     #print(f"LOG: Check if combined data contains same samples: {data_polyfit.index.equals(data_graph.index)}, {data_polyfit.index.equals(data_stretch.index)}")
 

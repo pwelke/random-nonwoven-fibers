@@ -35,18 +35,18 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 # Ansatz function
 def f(x, a, b):
     return (x >= a).astype(int)*(b*((x-a)**2))
-	
+    
 def getAdjR2(r2, n, p):
     return 1-(1-r2)*(n-1)/(n-p-1)
-	
+    
 def reduceFilePath(filepath):
-	return os.path.split(filepath)[1]
-	
+    return os.path.split(filepath)[1]
+    
 # Data import functions
 def readGraphFeatures(folder):
-	"""
-	Reads in calculated graph features placed in 'folder'
-	"""
+    """
+    Reads in calculated graph features placed in 'folder'
+    """
 
     # Get all the filenames in the directory
     path = join("features", folder)
@@ -70,9 +70,9 @@ def readGraphFeatures(folder):
     return data_graph
 	
 def readStretchFeatures(folder):
-	"""
-	Reads in calculated stretch features placed in 'folder'
-	"""
+    """
+    Reads in calculated stretch features placed in 'folder'
+    """
 
     # Get all the filenames in the directory
     path = join("features", folder)
@@ -96,9 +96,9 @@ def readStretchFeatures(folder):
     return data_stretch
 	
 def readPolyfitTargets(path):
-	"""
-	Reads in alpha, beta targets based on the ansatzfitting from 'path'
-	"""
+    """
+    Reads in alpha, beta targets based on the ansatzfitting from 'path'
+    """
 
     # Get all the filenames in the directory
     #path = f"labels/"
@@ -124,9 +124,9 @@ def readPolyfitTargets(path):
     return data_polyfit
 	
 def combineInputData(data_graph, data_stretch, data_polyfit, deduplicate = True):
-	"""
-	Combines the read in data into a single dataframe
-	"""
+    """
+    Combines the read in data into a single dataframe
+    """
     # Check if same samples inside both
     #print(f"LOG: Check if combined data contains same samples: {data_polyfit.index.equals(data_graph.index)}, {data_polyfit.index.equals(data_stretch.index)}")
 
@@ -146,9 +146,9 @@ def combineInputData(data_graph, data_stretch, data_polyfit, deduplicate = True)
     return data_joined
 	
 def readGraphOnlyData(folder):
-	"""
-	Reads in the graph features from unlabelled data points (without stress-strain curve)
-	"""
+    """
+    Reads in the graph features from unlabelled data points (without stress-strain curve)
+    """
 
     # Get all the filenames in the directory
     path = join("features", folder)
@@ -175,9 +175,9 @@ def readGraphOnlyData(folder):
     return data_graphonly
 	
 def getFeatureCombinations():
-	"""
-	Generates a dictionary containing the different possible feature combinations to test out
-	"""
+    """
+    Generates a dictionary containing the different possible feature combinations to test out
+    """
     param_features = ["kappa", "sigRamp", "sigSde", "sld"]
     graph_features = list(data_graph.columns[4:])
     stretch_features = list(data_stretch.columns)
@@ -195,9 +195,9 @@ def getFeatureCombinations():
 	
 def getParamCombinations(data_joined):
 
-	"""
-	Generates a list containing all identified parameter combinations within the dataset
-	"""
+    """
+    Generates a list containing all identified parameter combinations within the dataset
+    """
     # Identify parameter combinations
     para_combs = []
     for i in data_joined.index:
@@ -214,9 +214,9 @@ def getParamCombinations(data_joined):
     return para_combs
 	
 def getParamCombData(data, fix_param):
-	"""
-	Extracts the data points from dataframe corresponding to a fixed single parameter combination
-	"""
+    """
+    Extracts the data points from dataframe corresponding to a fixed single parameter combination
+    """
     fix_param_data = data[(data['kappa'] == fix_param['kappa']) 
                         & (data['sigRamp'] == fix_param['sigRamp'])
                         & (data['sigSde'] == fix_param['sigSde'])
@@ -225,9 +225,9 @@ def getParamCombData(data, fix_param):
 	
 def getMultipleParamCombData(data, fix_params):
     """
-	Extracts the data points from dataframe corresponding to a set of parameter combinations
-	"""
-	
+    Extracts the data points from dataframe corresponding to a set of parameter combinations
+    """
+    
     #Create empty dataframe
     fix_multiple_param_data = pd.DataFrame()
     
@@ -438,11 +438,11 @@ def take_closest(myList, myNumber):
        return after
     else:
        return before
-	   
+       
 def resampleCurve(curve, n_base_points = 1000):
-	"""
-	Resamples the input curve onto a given number of equidistantly spaced base points
-	"""
+    """
+    Resamples the input curve onto a given number of equidistantly spaced base points
+    """
     
     base_points = np.linspace(start = 0, stop = 0.5, num = n_base_points, endpoint = True)
     
@@ -540,9 +540,9 @@ def calculateMeanStd(orig_curves_resampled, pred_curves_resampled):
 	
 # Plotting
 def plotOrigPredCurve(k, base_points, orig_mean, orig_std, pred_mean, pred_std, single):
-	"""
-	For a given parameter combination, plots the actual and predicted mean stress-strain curves
-	"""
+    """
+    For a given parameter combination, plots the actual and predicted mean stress-strain curves
+    """
     fig = plt.figure()
     fig.set_size_inches(4,3)
     
