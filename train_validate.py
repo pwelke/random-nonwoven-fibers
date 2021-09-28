@@ -377,8 +377,8 @@ def train(data_joined, df_graphonly):
 									'fix_param':fix_param, 
 									'predictions':df_predictions})
 									
-	print(f"LOG: Number of trained models: {len(trained_models)}")
-	return df_predictions
+	#print(f"LOG: Number of trained models: {len(trained_models)}")
+	return predictions
 	
 # Validation
 def take_closest(myList, myNumber):
@@ -413,19 +413,22 @@ def resampleCurve(curve, n_base_points = 1000):
         
     return base_points, resampled_curve
 	
-def getResamplesOrigPredCurves(df_predictions, test_data, n_base_points = 1000):
+def getResamplesOrigPredCurves(folder, df_predictions, test_data, n_base_points = 1000):
     orig_curves_resampled = []
     pred_curves_resampled = []
 
     base_points = np.linspace(start = 0, stop = 0.5, num = n_base_points, endpoint = True)
-
+    #print(f"LOG: function getResamplesOrigPredCurves, len(df_predictions) = {len(df_predictions)}")
+	
     for sample in df_predictions.index:
         # Read in original data
-        for folder in ["Batch_28_01_2021", "Batch_25_02_2021", "Batch_15_02_2021", "Batch_02_03_2021", "Batch_20_03_2021"]:
-            my_file = Path(f"../data/{folder}/{sample}_StressStrainCurve.csv")
-            if my_file.is_file():
-                df_original = pd.read_csv(my_file, index_col = 0)
-                break
+        #print(f"LOG: function getResamplesOrigPredCurves, sample = {sample}")
+        #for folder in ["Batch_28_01_2021", "Batch_25_02_2021", "Batch_15_02_2021", "Batch_02_03_2021", "Batch_20_03_2021"]:
+		
+        my_file = Path(f"{folder}/{sample}_StressStrainCurve.csv")
+        #print(f"LOG: my_file = {my_file}")
+        if my_file.is_file():
+            df_original = pd.read_csv(my_file, index_col = 0)
 
         # Calculate predicted values
         pred_alpha = df_predictions.loc[sample, "predicted_alpha_linreg"]
@@ -552,7 +555,7 @@ def getBaseline(base_points, fix_param):
 
     return baseline_curve
 	
-def validate():
+def validate(folder, predictions, df_graphonly):
 	plot = False
 	ot_loss_sum = 0
 	r2_losses = []
@@ -566,7 +569,7 @@ def validate():
 		df_predictions = prediction['predictions']
 		test_data = getParamCombData(data_joined, fix_param)
 		
-		print(f"LOG: fix_param = {fix_param}")
+		#print(f"LOG: fix_param = {fix_param}")
 		
 		# Get Baseline
 		baseline_curve = getBaseline(base_points, fix_param)
@@ -575,7 +578,7 @@ def validate():
 			#print("LOG: Fall 1")
 		
 			# Resample
-			base_points, orig_curves_resampled, pred_curves_resampled = getResamplesOrigPredCurves(df_predictions, test_data)
+			base_points, orig_curves_resampled, pred_curves_resampled = getResamplesOrigPredCurves(folder, df_predictions, test_data)
 			orig_mean, orig_std, pred_mean, pred_std = calculateMeanStd(orig_curves_resampled, pred_curves_resampled)
 			
 			# Plot
@@ -603,7 +606,7 @@ def validate():
 		baseline_r2_loss.append(r2_score(orig_mean, baseline_curve))
 		#print(f"LOG: R^2: {r2_score(orig_mean, pred_mean)}")
 		
-	print(f"Sum of OT_Losses: {ot_loss_sum}")
+	#print(f"Sum of OT_Losses: {ot_loss_sum}")
 	print(f"LOG: Median R^2 across param combs: {np.median(r2_losses)}")
 	
 # Main
@@ -633,9 +636,13 @@ if __name__ == "__main__":
 	#print(f"data_polyfit: {data_polyfit.columns}")
 	#print(data_polyfit)
 	
-	train(data_joined, data_graphonly)
-	
-	validate()
+	# Train the models
+	predictions = train(data_joined, data_graphonly)
+    print("Done training models!")
+
+	# Validate the trained models
+	validate(folder, predictions, data_graphonly)
+	print("Done validating models!")
 	
 	#final_linreg_alpha, final_linreg_beta = trainFinalModel(data_joined, features = features)
 	
@@ -650,5 +657,5 @@ if __name__ == "__main__":
 	#pickle.dump(final_linreg_beta,outfile)
 	#outfile.close()
 	
-	print("Done training models!")
+
 	
