@@ -19,7 +19,8 @@ def f(x, a, b):
 def readGraphFeatures(folder):
 
     # Get all the filenames in the directory
-    path = f"features/{folder}/"
+    #path = f"features/{folder}/"
+    path = join("features", folder)
     files = [f for f in listdir(path) if isfile(join(path, f)) and "_graph" in f]
     
     # Creat empty list
@@ -27,7 +28,7 @@ def readGraphFeatures(folder):
     
     # Iterate over files
     for f in files:
-        file = f"{path}/{f}"
+        file = join(path, f)
         data = pd.read_csv(file, delimiter=',', encoding='utf-8', index_col = 0)
         li.append(data)
         
@@ -43,7 +44,7 @@ def readGraphFeatures(folder):
 def readStretchFeatures(folder):
 
     # Get all the filenames in the directory
-    path = f"features/{folder}/"
+    path = join("features", folder)
     files = [f for f in listdir(path) if isfile(join(path, f)) and "_stretch" in f]
     
     # Creat empty list
@@ -51,7 +52,7 @@ def readStretchFeatures(folder):
     
     # Iterate over files
     for f in files:
-        file = f"{path}/{f}"
+        file = join(path, f)
         data = pd.read_csv(file, delimiter=',', encoding='utf-8', index_col = 0)
         li.append(data)
         
@@ -75,7 +76,7 @@ def readPolyfitTargets(path):
     
     # Iterate over files
     for f in files:
-        file = f"{path}/{f}"
+        file = join(path, f)
         data = pd.read_csv(file, delimiter=',', encoding='utf-8', index_col = 0)
         data = data.T
         data.index = [f]
@@ -109,9 +110,9 @@ def combineInputData(data_graph, data_stretch, data_polyfit, deduplicate = True)
     return data_joined
 	
 def getFeatureCombinations():
-	"""
-	This function groups the columns into feature sets togeter and returns a dict
-	"""
+    """
+    This function groups the columns into feature sets togeter and returns a dict
+    """
     param_features = ["kappa", "sigRamp", "sigSde", "sld"]
     graph_features = list(data_graph.columns[4:])
     stretch_features = list(data_stretch.columns)
@@ -146,14 +147,12 @@ if __name__ == "__main__":
 	
 	data_graph = readGraphFeatures(folder)
 	data_stretch = readStretchFeatures(folder)
-	data_polyfit = readPolyfitTargets(f"polyfit/{folder}/")
+	polyfit_path = join("polyfit", folder)
+	data_polyfit = readPolyfitTargets(polyfit_path)
+	#data_polyfit = readPolyfitTargets(f"polyfit/{folder}/")
 	data_joined = combineInputData(data_graph, data_stretch, data_polyfit, deduplicate = True)
 	features = 'graph+stretch'
 	feature_comb = getFeatureCombinations()[features]
-	
-	#print(f"Länge von data_polyfit: {len(data_polyfit)}")
-	#print(f"data_polyfit: {data_polyfit.columns}")
-	#print(data_polyfit)
 	
 	final_linreg_alpha, final_linreg_beta = trainFinalModel(data_joined, features = features)
 	
