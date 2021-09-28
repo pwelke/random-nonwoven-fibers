@@ -4,6 +4,7 @@ import pandas as pd
 
 # System
 from os import listdir
+import os.path
 from os.path import isfile, join
 import sys, getopt
 from pathlib import Path
@@ -36,6 +37,9 @@ def f(x, a, b):
 def getAdjR2(r2, n, p):
     return 1-(1-r2)*(n-1)/(n-p-1)
 	
+def reduceFilePath(filepath):
+	return os.path.split(filepath)[1]
+	
 def readGraphFeatures(folder):
 
     # Get all the filenames in the directory
@@ -52,10 +56,9 @@ def readGraphFeatures(folder):
         li.append(data)
         
     # Combine into dataframe and return
-    data_graph = pd.concat(li, axis=0, ignore_index=False)
+    data_graph = pd.concat(li, axis = 0, ignore_index = False)
     data_graph.index = data_graph.index.str.replace("_Microstructure.graphml", "")
-    data_graph.index = data_graph.index.str.replace(folder, '')
-    data_graph.index = data_graph.index.str.replace("\\",'')
+    data_graph.index = data_graph.index.map(reduceFilePath)
     data_graph = data_graph.sort_index()
     
     return data_graph
@@ -78,8 +81,7 @@ def readStretchFeatures(folder):
     # Combine into dataframe and return
     data_stretch = pd.concat(li, axis=0, ignore_index=False)
     data_stretch.index = data_stretch.index.str.replace("_Microstructure.graphml", "")
-    data_stretch.index = data_graph.index.str.replace(folder, '')
-    data_stretch.index = data_graph.index.str.replace("\\",'')
+    data_stretch.index = data_stretch.index.map(reduceFilePath)
     data_stretch = data_stretch.sort_index()
     
     return data_stretch
@@ -145,8 +147,11 @@ def readGraphOnlyData(folder):
     # Combine into dataframe and return
     data_graphonly = pd.concat(li, axis=0, ignore_index=False)
     data_graphonly.index = data_graphonly.index.str.replace("_Microstructure.graphml", "")
-    data_graphonly.index = data_graphonly.index.str.replace(folder, '')
-    data_graphonly.index = data_graphonly.index.str.replace("\\",'')
+	
+    data_graphonly.index = data_graphonly.index.map(reduceFilePath)
+    #data_graphonly.index = data_graphonly.index.str.replace(folder, '')
+    #data_graphonly.index = data_graphonly.index.str.replace("\\",'')
+	
     data_graphonly = data_graphonly.sort_index()
     
     return data_graphonly
@@ -629,8 +634,6 @@ if __name__ == "__main__":
     
     # Keep all but the first
     argument_list = full_cmd_arguments[1:]
-	
-    print(argument_list)
     
     short_options = "p"
     long_options = ["plot"]
