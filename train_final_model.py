@@ -19,7 +19,6 @@ def f(x, a, b):
 def readGraphFeatures(folder):
 
     # Get all the filenames in the directory
-    #path = f"features/{folder}/"
     path = join("features", folder)
     files = [f for f in listdir(path) if isfile(join(path, f)) and "_graph" in f]
     
@@ -149,7 +148,6 @@ if __name__ == "__main__":
 	data_stretch = readStretchFeatures(folder)
 	polyfit_path = join("polyfit", folder)
 	data_polyfit = readPolyfitTargets(polyfit_path)
-	#data_polyfit = readPolyfitTargets(f"polyfit/{folder}/")
 	data_joined = combineInputData(data_graph, data_stretch, data_polyfit, deduplicate = True)
 	features = 'graph+stretch'
 	feature_comb = getFeatureCombinations()[features]
