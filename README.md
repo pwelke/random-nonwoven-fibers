@@ -45,7 +45,20 @@ File:
 Results are placed in ```polyfit/``` with a subfolder corresponding to the folder/filename. 
 !!! Please note, only folders/files in the base directory of this repository work. Please consider creating a symlink if you have to store the data somewhere else !!! 
 
+### Train and validate
+
+Performs cross-validation to reproduce the results in the paper. For each parameter combination in the labelled dataset trains two models (for alpha, beta) on all datapoints except for the chosen combination and tests them on the rest.
+
+```python train_validate.py input_data_labelled input_graphonly```
+
+You can acitivate plotting with the "-p" flag:
+
+```python train_validate.py input_data_labelled input_graphonly -p```
+
+Plots are placed in the folder "visuals".
+
 ### Training final model
+
 Train linear regression models for predicting alpha and beta respectively.
 
 ```python train_final_model.py input_data_labelled``` 
