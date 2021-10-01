@@ -124,6 +124,9 @@ def readPolyfitTargets(path):
     data_polyfit.index = data_polyfit.index.str.replace("_StressStrainCurve.csv_polyfit.csv", "")
     #data_polyfit = data_polyfit.sort_index()
     
+    print("LOG: data_polyfit:")
+    print(data_polyfit)
+    
     return data_polyfit
 	
 def combineInputData(data_graph, data_stretch, data_polyfit, deduplicate = True):
@@ -332,13 +335,13 @@ def train(data_joined, df_graphonly):
 				#reg_alpha = LinearRegression().fit(X_train_scaled, y_train_alpha)
 				#reg_beta = LinearRegression().fit(X_train_scaled, y_train_beta)
 				
-				print(f"LOG: len(X_train_scaled) = {len(X_train_scaled)}, len(y_train_alpha) = {len(y_train_alpha)}, len(y_train_beta) = {len(y_train_beta)}, ")
+				#print(f"LOG: len(X_train_scaled) = {len(X_train_scaled)}, len(y_train_alpha) = {len(y_train_alpha)}, len(y_train_beta) = {len(y_train_beta)}")
 				
-				print(X_train_scaled)
+				#print(X_train_scaled)
 				
-				print(y_train_alpha)
+				#print(y_train_alpha)
 				
-				print(y_train_beta)
+				#print(y_train_beta)
 				
 				if lasso:
 					reg_alpha = Lasso(alpha = 0.005).fit(X_train_scaled, y_train_alpha)
