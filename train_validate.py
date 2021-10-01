@@ -124,7 +124,7 @@ def readPolyfitTargets(path):
     data_polyfit.index = data_polyfit.index.str.replace("_StressStrainCurve.csv_polyfit.csv", "")
     #data_polyfit = data_polyfit.sort_index()
     
-    print("LOG: data_polyfit:")
+    print("\nLOG: data_polyfit:")
     print(data_polyfit)
     
     return data_polyfit
@@ -149,6 +149,9 @@ def combineInputData(data_graph, data_stretch, data_polyfit, deduplicate = True)
     #print(f"LOG: Input samples: {len(data_joined)}")
     #print(f"LOG: Number of missing values: {data_joined.isnull().sum().sum()}")
     
+    print("\nLOG: data_joined:")
+    print(data_joined)
+	
     return data_joined
 	
 def readGraphOnlyData(folder):
