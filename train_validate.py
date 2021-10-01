@@ -331,6 +331,12 @@ def train(data_joined, df_graphonly):
 				
 				print(f"LOG: len(X_train_scaled) = {len(X_train_scaled)}, len(y_train_alpha) = {len(y_train_alpha)}, len(y_train_beta) = {len(y_train_beta)}, ")
 				
+				print(X_train_scaled)
+				
+				print(y_train_alpha)
+				
+				print(y_train_beta)
+				
 				if lasso:
 					reg_alpha = Lasso(alpha = 0.005).fit(X_train_scaled, y_train_alpha)
 					reg_beta = Lasso(alpha = 0.005).fit(X_train_scaled, y_train_beta)
