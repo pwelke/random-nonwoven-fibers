@@ -47,11 +47,11 @@ Results are placed in ```polyfit/``` with a subfolder corresponding to the folde
 
 ### Train and validate
 
-Performs cross-validation to reproduce the results in the paper. For each parameter combination in the labelled dataset trains two models (for alpha, beta) on all datapoints except for the chosen combination and tests them on the rest.
+Performs cross-validation to reproduce the results in the paper. For each parameter combination in the labelled dataset trains two models (for alpha, beta) on all data points except for the chosen combination and tests them on the rest.
 
 ```python train_validate.py input_data_labelled input_graphonly```
 
-You can acitivate plotting with the "-p" flag:
+You can activate plotting with the "-p" flag:
 
 ```python train_validate.py input_data_labelled input_graphonly -p```
 

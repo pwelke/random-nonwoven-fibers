@@ -1,5 +1,6 @@
 name: nwf-stretch
 channels:
+  - conda-forge
   - defaults
 dependencies:
   - networkx=2.6
@@ -11,3 +12,4 @@ dependencies:
   - tqdm
   - scikit-learn
   - requests
+  - pot=0.7.0
