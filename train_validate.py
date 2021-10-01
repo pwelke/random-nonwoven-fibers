@@ -66,6 +66,9 @@ def readGraphFeatures(folder):
     data_graph.index = data_graph.index.str.replace("_Microstructure.graphml", "")
     data_graph.index = data_graph.index.map(reduceFilePath)
     data_graph = data_graph.sort_index()
+	
+    print("\nLOG: data_graph:")
+    print(data_graph)
     
     return data_graph
 	
@@ -92,6 +95,9 @@ def readStretchFeatures(folder):
     data_stretch.index = data_stretch.index.str.replace("_Microstructure.graphml", "")
     data_stretch.index = data_stretch.index.map(reduceFilePath)
     data_stretch = data_stretch.sort_index()
+	
+    print("\nLOG: data_stretch:")
+    print(data_stretch)
     
     return data_stretch
 	
