@@ -115,6 +115,9 @@ def readPolyfitTargets(path):
         data.index = [f]
         li.append(data)
         
+	print("LOG: Versuche polyfit targets einzulesen")
+	print(f"LOG: {f}")
+		
     # Combine into dataframe and return
     #data_polyfit = pd.concat(li, axis=0, ignore_index=False)
     data_polyfit = pd.concat(li, ignore_index=False)
