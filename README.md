@@ -47,7 +47,9 @@ Results are placed in ```polyfit/``` with a subfolder corresponding to the folde
 
 ### Train and validate
 
-Performs cross-validation to reproduce the results in the paper. For each parameter combination in the labelled dataset trains two models (for alpha, beta) on all data points except for the chosen combination and tests them on the rest.
+To reproduce the results in the paper you can run the ```train_validate.py``` script. For each parameter combination in the labelled dataset this function trains two models (for alpha, beta) on all data points except for the chosen combination and tests them on the rest.
+
+Assuming that you have labeled input data in folder or file ```input_data_labelled``` and unlabeled input data in ```input_data_graphonly``` and have already run ```feature_generation.py``` and ```ansatzfitting.py``` for both datasets, you can run
 
 ```python train_validate.py input_data_labelled input_graphonly```
 
@@ -56,6 +58,8 @@ You can activate plotting with the "-p" flag:
 ```python train_validate.py input_data_labelled input_graphonly -p```
 
 Plots are placed in the folder "visuals".
+
+
 
 ### Training final model
 
