@@ -66,9 +66,6 @@ def readGraphFeatures(folder):
     data_graph.index = data_graph.index.str.replace("_Microstructure.graphml", "")
     data_graph.index = data_graph.index.map(reduceFilePath)
     data_graph = data_graph.sort_index()
-	
-    print("\nLOG: data_graph:")
-    print(data_graph)
     
     return data_graph
 	
@@ -95,9 +92,6 @@ def readStretchFeatures(folder):
     data_stretch.index = data_stretch.index.str.replace("_Microstructure.graphml", "")
     data_stretch.index = data_stretch.index.map(reduceFilePath)
     data_stretch = data_stretch.sort_index()
-	
-    print("\nLOG: data_stretch:")
-    print(data_stretch)
     
     return data_stretch
 	
@@ -130,9 +124,6 @@ def readPolyfitTargets(path):
     data_polyfit.index = data_polyfit.index.str.replace("_StressStrainCurve.csv_polyfit.csv", "")
     #data_polyfit = data_polyfit.sort_index()
     
-    print("\nLOG: data_polyfit:")
-    print(data_polyfit)
-    
     return data_polyfit
 	
 def combineInputData(data_graph, data_stretch, data_polyfit, deduplicate = True):
@@ -154,9 +145,6 @@ def combineInputData(data_graph, data_stretch, data_polyfit, deduplicate = True)
     
     #print(f"LOG: Input samples: {len(data_joined)}")
     #print(f"LOG: Number of missing values: {data_joined.isnull().sum().sum()}")
-    
-    print("\nLOG: data_joined:")
-    print(data_joined)
 	
     return data_joined
 	
