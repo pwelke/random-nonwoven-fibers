@@ -4,12 +4,13 @@ import numpy as np
 import pandas as pd
 
 # System
-from os import listdir
+from os import listdir, remove
 import os.path
-from os.path import isfile, join
+from os.path import isfile, join, splitext
 import sys, getopt
 from pathlib import Path
 from datetime import date
+import tarfile
 
 # Persistance
 import pickle
@@ -467,7 +468,7 @@ def resampleCurve(curve, n_base_points = 1000):
         
     return base_points, resampled_curve
 	
-def getResamplesOrigPredCurves(folder, df_predictions, test_data, n_base_points = 1000):
+def getResamplesOrigPredCurves(folder, df_predictions, test_data, zipped = False, n_base_points = 1000):
     orig_curves_resampled = []
     pred_curves_resampled = []
 
@@ -479,11 +480,42 @@ def getResamplesOrigPredCurves(folder, df_predictions, test_data, n_base_points 
         #print(f"LOG: function getResamplesOrigPredCurves, sample = {sample}")
         
         my_file_path = join(folder, sample)
-        my_file = Path(f"{my_file_path}_StressStrainCurve.csv")
-        #my_file = Path(f"{folder}/{sample}_StressStrainCurve.csv")
-        #print(f"LOG: my_file = {my_file}")
-        if my_file.is_file():
-            df_original = pd.read_csv(my_file, index_col = 0)
+        
+        #zipped = True
+        print(f"LOG: zipped = {zipped}")
+        
+        # Working with tar-files
+        if zipped:
+            
+            tarfile_path = "toy_data_labeled.tar.gz"
+			
+            with tarfile.open(tarfile_path, 'r:*') as tarredfiles:
+                for tarinfo in tarredfiles:
+                    if tarinfo.isreg():
+                        if splitext(tarinfo.name)[1] == '.csv':
+                            # have a folder called like the tarfile and a file named after the current file in the tarfile
+                            # content of tarfile is streamed
+                            tarredfiles.extract(tarinfo)
+                            #compute_all_graph_features(filename=join(folder, tarinfo.name), file=tarinfo.name)
+                            
+                            tarinfo_name = tarinfo.name
+                            tarinfo_name = tarinfo_name.replace("_StressStrainCurve.csv", "")
+                            
+                            if sample == tarinfo_name:
+                                my_file = f"{tarfile_path}/{tarinfo.name}"
+                                #my_file = join(tarfile_path, tarinfo.name)
+                                df_original = pd.read_csv(tarinfo.name, index_col = 0)
+                                #df_original = pd.read_csv(my_file, index_col = 0)
+                                break
+                            
+                            remove(tarinfo.name)
+        
+        else:
+            my_file = Path(f"{my_file_path}_StressStrainCurve.csv")
+            #my_file = Path(f"{folder}/{sample}_StressStrainCurve.csv")
+            #print(f"LOG: my_file = {my_file}")
+            if my_file.is_file():
+            	df_original = pd.read_csv(my_file, index_col = 0)
 
         # Calculate predicted values
         pred_alpha = df_predictions.loc[sample, "predicted_alpha_linreg"]
@@ -615,7 +647,7 @@ def getBaseline(base_points, fix_param):
 
     return baseline_curve
 	
-def validate(folder, predictions, df_graphonly, plot = False):
+def validate(folder, predictions, df_graphonly, plot = False, zipped = False):
 	"""
 	Performs k-fold cross-validation on the dataset
 	"""
@@ -642,7 +674,7 @@ def validate(folder, predictions, df_graphonly, plot = False):
 			#print("LOG: Fall 1")
 		
 			# Resample
-			base_points, orig_curves_resampled, pred_curves_resampled = getResamplesOrigPredCurves(folder, df_predictions, test_data)
+			base_points, orig_curves_resampled, pred_curves_resampled = getResamplesOrigPredCurves(folder, df_predictions, test_data, zipped)
 			orig_mean, orig_std, pred_mean, pred_std = calculateMeanStd(orig_curves_resampled, pred_curves_resampled)
 			
 			# Plot
@@ -691,10 +723,15 @@ if __name__ == "__main__":
         
     # Evaluate given options
     plot = False
+    zipped = False
+	
     for current_argument in argument_list:
         if current_argument in ("-p", "--plot"):
             print ("Enabling plotting mode")
             plot = True
+        if current_argument in ("-f", "--file"):
+            print ("Enabling zipped mode")
+            zipped = True
     
     # Read data in
     data_graph = readGraphFeatures(folder)
@@ -723,7 +760,7 @@ if __name__ == "__main__":
     print("Done training models!")
 
     # Validate the trained models
-    validate(folder, predictions, data_graphonly, plot = plot)
+    validate(folder, predictions, data_graphonly, plot = plot, zipped = zipped)
     print("Done validating models!")
     
     #final_linreg_alpha, final_linreg_beta = trainFinalModel(data_joined, features = features)
