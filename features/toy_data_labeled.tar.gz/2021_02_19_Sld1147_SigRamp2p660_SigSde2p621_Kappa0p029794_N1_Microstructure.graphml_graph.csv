@@ -1,0 +1,2 @@
+,kappa,sigRamp,sigSde,sld,n_nodes,n_edges,max_degree,length_sum,n_upper_face,n_lower_face,min_dist,min_weight_dist,min_eucl_dist,diff_eucl_length_mean,diff_eucl_length_median,diff_eucl_length_sum,min_cut_size
+toy_data_labeled.tar.gz\2021_02_19_Sld1147_SigRamp2p660_SigSde2p621_Kappa0p029794_N1_Microstructure.graphml,0.029794,2.660,2.621,1147,48480,176665,348,11021.252712599895,82,89,85,7.590443000000004,7.495480213209916,0.0027072756486305805,1.1014201885241326e-05,478.2808524653215,82

@@ -43,6 +43,9 @@ def readGraphFeatures(folder):
     data_graph.index = data_graph.index.str.replace(folder, '')
     data_graph.index = data_graph.index.str.replace("\\",'')
     data_graph = data_graph.sort_index()
+	
+    print(f"LOG: data_graph:")
+    print(data_graph)
     
     return data_graph
 	
@@ -69,6 +72,9 @@ def readStretchFeatures(folder):
     data_stretch.index = data_graph.index.str.replace(folder, '')
     data_stretch.index = data_graph.index.str.replace("\\",'')
     data_stretch = data_stretch.sort_index()
+	
+    print(f"LOG: data_stretch:")
+    print(data_stretch)
     
     return data_stretch
 	
@@ -96,6 +102,9 @@ def readPolyfitTargets(path):
     data_polyfit = pd.concat(li, ignore_index=False)
     data_polyfit.index = data_polyfit.index.str.replace("_StressStrainCurve.csv_polyfit.csv", "")
     #data_polyfit = data_polyfit.sort_index()
+	
+    print(f"LOG: data_stretch:")
+    print(data_stretch)	
     
     return data_polyfit
 	
@@ -156,6 +165,21 @@ def trainFinalModel(data_joined, features):
 if __name__ == "__main__":
 
 	folder = sys.argv[1]
+	
+	
+    # Get full command-line arguments
+	full_cmd_arguments = sys.argv
+    
+    # Keep all but the first
+	argument_list = full_cmd_arguments[1:]
+	
+    # Evaluate given options
+	zipped = False
+	
+	for current_argument in argument_list:
+		if current_argument in ("-f", "--file"):
+			print ("Enabling zipped mode")
+			zipped = True
 	
 	data_graph = readGraphFeatures(folder)
 	data_stretch = readStretchFeatures(folder)
