@@ -17,8 +17,6 @@ import pickle
 
 # Plotting
 import matplotlib.pyplot as plt
-#from ipywidgets import interact, fixed
-#from IPython.display import display, HTML
 
 # Validation
 import ot
@@ -102,7 +100,6 @@ def readPolyfitTargets(path):
     """
 
     # Get all the filenames in the directory
-    #path = f"labels/"
     files = [f for f in listdir(path) if isfile(join(path, f)) and "_polyfit" in f]
     
     # Creat empty list
@@ -120,10 +117,8 @@ def readPolyfitTargets(path):
     print(f"LOG: {f}")
     
     # Combine into dataframe and return
-    #data_polyfit = pd.concat(li, axis=0, ignore_index=False)
     data_polyfit = pd.concat(li, ignore_index=False)
     data_polyfit.index = data_polyfit.index.str.replace("_StressStrainCurve.csv_polyfit.csv", "")
-    #data_polyfit = data_polyfit.sort_index()
     
     return data_polyfit
 	
@@ -131,8 +126,6 @@ def combineInputData(data_graph, data_stretch, data_polyfit, deduplicate = True)
     """
     Combines the read in data into a single dataframe
     """
-    # Check if same samples inside both
-    #print(f"LOG: Check if combined data contains same samples: {data_polyfit.index.equals(data_graph.index)}, {data_polyfit.index.equals(data_stretch.index)}")
 
     data_joined = data_graph.join(data_polyfit)
     data_joined = data_joined.join(data_stretch)
@@ -143,9 +136,6 @@ def combineInputData(data_graph, data_stretch, data_polyfit, deduplicate = True)
     # Remove duplicated entries
     if deduplicate:
         data_joined = data_joined[data_joined.duplicated() == False]
-    
-    #print(f"LOG: Input samples: {len(data_joined)}")
-    #print(f"LOG: Number of missing values: {data_joined.isnull().sum().sum()}")
 	
     return data_joined
 	
@@ -171,8 +161,6 @@ def readGraphOnlyData(folder):
     data_graphonly.index = data_graphonly.index.str.replace("_Microstructure.graphml", "")
 	
     data_graphonly.index = data_graphonly.index.map(reduceFilePath)
-    #data_graphonly.index = data_graphonly.index.str.replace(folder, '')
-    #data_graphonly.index = data_graphonly.index.str.replace("\\",'')
 	
     data_graphonly = data_graphonly.sort_index()
     
@@ -213,8 +201,6 @@ def getParamCombinations(data_joined):
         if not {'kappa': kappa, 'sigRamp': sigRamp, 'sigSde': sigSde, 'sld': sld} in para_combs:
             para_combs.append({'kappa': kappa, 'sigRamp': sigRamp, 'sigSde': sigSde, 'sld': sld}) 
 
-    #print(f"{len(para_combs)} verschiedene Parameter-Kombinationen im Datensatz")
-    
     return para_combs
 	
 def getParamCombData(data, fix_param):
@@ -240,7 +226,6 @@ def getMultipleParamCombData(data, fix_params):
                                     & (data_joined['sigRamp'] == fix_param['sigRamp'])
                                     & (data_joined['sigSde'] == fix_param['sigSde'])
                                     & (data_joined['sld'] == fix_param['sld'])]
-        #print(len(test_data_fix_param))
         fix_multiple_param_data = fix_multiple_param_data.append(fix_param_data)
         
     return fix_multiple_param_data
@@ -320,26 +305,12 @@ def train(data_joined, df_graphonly):
 					#scaler = StandardScaler()
 					scaler = MinMaxScaler(feature_range = (-1,1))
 					# Fit on train data, transform both train and test data
-					#print(f"LOG: Scale data on columns: {X_train.columns}")
 					scaler.fit(X_train)
 					X_train_scaled = pd.DataFrame(scaler.transform(X_train), index = X_train.index, columns = X_train.columns)
 					X_test_scaled = pd.DataFrame(scaler.transform(X_test), index = X_test.index, columns = X_test.columns)
 				else: 
 					X_train_scaled = X_train
 					X_test_scaled = X_test
-
-				# Train nodel
-				
-				#reg_alpha = LinearRegression().fit(X_train_scaled, y_train_alpha)
-				#reg_beta = LinearRegression().fit(X_train_scaled, y_train_beta)
-				
-				#print(f"LOG: len(X_train_scaled) = {len(X_train_scaled)}, len(y_train_alpha) = {len(y_train_alpha)}, len(y_train_beta) = {len(y_train_beta)}")
-				
-				#print(X_train_scaled)
-				
-				#print(y_train_alpha)
-				
-				#print(y_train_beta)
 				
 				if lasso:
 					reg_alpha = Lasso(alpha = 0.005).fit(X_train_scaled, y_train_alpha)
@@ -399,10 +370,6 @@ def train(data_joined, df_graphonly):
 					X_train_scaled = X_train
 					X_test_scaled = X_test
 				
-				# Train nodel
-				#reg_alpha = LinearRegression().fit(X_train_scaled, y_train_alpha)
-				#reg_beta = LinearRegression().fit(X_train_scaled, y_train_beta)
-				
 				if lasso:
 					reg_alpha = Lasso(alpha = 0.005).fit(X_train_scaled, y_train_alpha)
 					reg_beta = Lasso(alpha = 0.005).fit(X_train_scaled, y_train_beta)
@@ -429,7 +396,6 @@ def train(data_joined, df_graphonly):
 									'fix_param':fix_param, 
 									'predictions':df_predictions})
 									
-	#print(f"LOG: Number of trained models: {len(trained_models)}")
 	return predictions
 	
 # Validation
@@ -473,16 +439,9 @@ def getResamplesOrigPredCurves(folder, df_predictions, test_data, zipped = False
     pred_curves_resampled = []
 
     base_points = np.linspace(start = 0, stop = 0.5, num = n_base_points, endpoint = True)
-    #print(f"LOG: function getResamplesOrigPredCurves, len(df_predictions) = {len(df_predictions)}")
 	
     for sample in df_predictions.index:
-        # Read in original data
-        #print(f"LOG: function getResamplesOrigPredCurves, sample = {sample}")
-        
         my_file_path = join(folder, sample)
-        
-        #zipped = True
-        print(f"LOG: zipped = {zipped}")
         
         # Working with tar-files
         if zipped:
@@ -496,24 +455,19 @@ def getResamplesOrigPredCurves(folder, df_predictions, test_data, zipped = False
                             # have a folder called like the tarfile and a file named after the current file in the tarfile
                             # content of tarfile is streamed
                             tarredfiles.extract(tarinfo)
-                            #compute_all_graph_features(filename=join(folder, tarinfo.name), file=tarinfo.name)
                             
                             tarinfo_name = tarinfo.name
                             tarinfo_name = tarinfo_name.replace("_StressStrainCurve.csv", "")
                             
                             if sample == tarinfo_name:
                                 my_file = f"{tarfile_path}/{tarinfo.name}"
-                                #my_file = join(tarfile_path, tarinfo.name)
                                 df_original = pd.read_csv(tarinfo.name, index_col = 0)
-                                #df_original = pd.read_csv(my_file, index_col = 0)
                                 break
                             
                             remove(tarinfo.name)
         
         else:
             my_file = Path(f"{my_file_path}_StressStrainCurve.csv")
-            #my_file = Path(f"{folder}/{sample}_StressStrainCurve.csv")
-            #print(f"LOG: my_file = {my_file}")
             if my_file.is_file():
             	df_original = pd.read_csv(my_file, index_col = 0)
 
@@ -527,8 +481,6 @@ def getResamplesOrigPredCurves(folder, df_predictions, test_data, zipped = False
         base_points, pred_curve_resampled = resampleCurve(predicted_curve, n_base_points = n_base_points)
         orig_curves_resampled.append(pd.Series(data = orig_curve_resampled, index = base_points))
         pred_curves_resampled.append(pd.Series(data = pred_curve_resampled, index = base_points))
-
-        #print(f"LOG: len of orig = {len(df_original)}, len of pred = {len(predicted_curve)}")
         
     return base_points, orig_curves_resampled, pred_curves_resampled
 	

@@ -18,6 +18,17 @@ In particular
 - ```unlabeled.tar.gz``` contains 739 graphs in GML format without corresponding strain/stress curves.
 
 ## Usage
+### Full Usage Example with zipped files
+```python feature_generation.py -f toy_data_labeled.tar.gz```
+```python ansatzfitting.py -f toy_data_labeled.tar.gz```
+```python train_final_model.py toy_data_labeled.tar.gz```
+
+### Full Usage Example with unzipped files
+```python feature_generation.py input_data_labelled```
+```python ansatzfitting.py input_data_labelled```
+```python train_final_model.py input_data_labelled```
+
+
 ### Feature generation
 Calculate graph and stretch features for a set of graphml files from a folder or a gzipped file:
 
@@ -51,11 +62,11 @@ To reproduce the results in the paper you can run the ```train_validate.py``` sc
 
 Assuming that you have labeled input data in folder or file ```input_data_labelled``` and unlabeled input data in ```input_data_graphonly``` and have already run ```feature_generation.py``` and ```ansatzfitting.py``` for both datasets, you can run
 
-```python train_validate.py input_data_labelled input_graphonly```
+```python train_validate.py input_data_labelled input_data_graphonly```
 
 You can activate plotting with the "-p" flag:
 
-```python train_validate.py input_data_labelled input_graphonly -p```
+```python train_validate.py input_data_labelled input_data_graphonly -p```
 
 Plots are placed in the folder "visuals".
 

@@ -48,9 +48,6 @@ def readGraphFeatures(folder):
     data_graph.index = data_graph.index.str.replace("_Microstructure.graphml", "")
     data_graph.index = data_graph.index.map(reduceFilePath)
     data_graph = data_graph.sort_index()
-	
-    print(f"LOG: data_graph:")
-    print(data_graph)
     
     return data_graph
 	
@@ -76,9 +73,6 @@ def readStretchFeatures(folder):
     data_stretch.index = data_stretch.index.str.replace("_Microstructure.graphml", "")
     data_stretch.index = data_stretch.index.map(reduceFilePath)
     data_stretch = data_stretch.sort_index()
-	
-    print(f"LOG: data_stretch:")
-    print(data_stretch)
     
     return data_stretch
 	
@@ -87,7 +81,6 @@ def readPolyfitTargets(path):
     Reads in alpha, beta targets based on the ansatzfitting from 'path'
     """
     # Get all the filenames in the directory
-    #path = f"labels/"
     files = [f for f in listdir(path) if isfile(join(path, f)) and "_polyfit" in f]
     
     # Creat empty list
@@ -102,13 +95,8 @@ def readPolyfitTargets(path):
         li.append(data)
         
     # Combine into dataframe and return
-    #data_polyfit = pd.concat(li, axis=0, ignore_index=False)
     data_polyfit = pd.concat(li, ignore_index=False)
     data_polyfit.index = data_polyfit.index.str.replace("_StressStrainCurve.csv_polyfit.csv", "")
-    #data_polyfit = data_polyfit.sort_index()
-	
-    print(f"LOG: data_polyfit:")
-    print(data_polyfit)	
     
     return data_polyfit
 	
@@ -116,8 +104,6 @@ def combineInputData(data_graph, data_stretch, data_polyfit, deduplicate = True)
     """
     Combines the read in data into a single dataframe
     """
-    # Check if same samples inside both
-    #print(f"LOG: Check if combined data contains same samples: {data_polyfit.index.equals(data_graph.index)}, {data_polyfit.index.equals(data_stretch.index)}")
 
     data_joined = data_graph.join(data_polyfit)
     data_joined = data_joined.join(data_stretch)
@@ -128,9 +114,6 @@ def combineInputData(data_graph, data_stretch, data_polyfit, deduplicate = True)
     # Remove duplicated entries
     if deduplicate:
         data_joined = data_joined[data_joined.duplicated() == False]
-    
-    #print(f"LOG: Input samples: {len(data_joined)}")
-    #print(f"LOG: Number of missing values: {data_joined.isnull().sum().sum()}")
     
     return data_joined
 	
@@ -169,7 +152,6 @@ def trainFinalModel(data_joined, features):
 if __name__ == "__main__":
 
 	folder = sys.argv[1]
-	
 	
     # Get full command-line arguments
 	full_cmd_arguments = sys.argv
