@@ -3,6 +3,9 @@
 import pandas as pd
 
 # System
+from os import listdir, remove
+import os.path
+from os.path import isfile, join, splitext
 from os import listdir
 from os.path import isfile, join
 import sys
@@ -19,6 +22,9 @@ def f(x, a, b):
     Constant-quadratic ansatz-function with two parameters
     """
     return (x >= a).astype(int)*(b*((x-a)**2))
+	
+def reduceFilePath(filepath):
+    return os.path.split(filepath)[1]
 	
 def readGraphFeatures(folder):
     """
