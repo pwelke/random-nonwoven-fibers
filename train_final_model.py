@@ -103,8 +103,8 @@ def readPolyfitTargets(path):
     data_polyfit.index = data_polyfit.index.str.replace("_StressStrainCurve.csv_polyfit.csv", "")
     #data_polyfit = data_polyfit.sort_index()
 	
-    print(f"LOG: data_stretch:")
-    print(data_stretch)	
+    print(f"LOG: data_polyfit:")
+    print(data_polyfit)	
     
     return data_polyfit
 	
