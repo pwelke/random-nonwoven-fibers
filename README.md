@@ -19,14 +19,14 @@ In particular
 
 ## Usage
 ### Full Usage Example with zipped files
-```python feature_generation.py -f toy_data_labeled.tar.gz```
-```python ansatzfitting.py -f toy_data_labeled.tar.gz```
-```python train_final_model.py toy_data_labeled.tar.gz```
+- ```python feature_generation.py -f toy_data_labeled.tar.gz```
+- ```python ansatzfitting.py -f toy_data_labeled.tar.gz```
+- ```python train_final_model.py toy_data_labeled.tar.gz```
 
 ### Full Usage Example with unzipped files
-```python feature_generation.py input_data_labelled```
-```python ansatzfitting.py input_data_labelled```
-```python train_final_model.py input_data_labelled```
+- ```python feature_generation.py input_data_labelled```
+- ```python ansatzfitting.py input_data_labelled```
+- ```python train_final_model.py input_data_labelled```
 
 
 ### Feature generation
