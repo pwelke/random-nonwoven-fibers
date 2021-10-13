@@ -24,9 +24,9 @@ In particular
 conda activate nwf-stretch
 
 python download_data.py
-python feature_generation.py -f data_labeled.tar.gz
-python ansatzfitting.py -f data_labeled.tar.gz
-python train_final_model.py data_labeled.tar.gz
+python feature_generation.py -f labeled.tar.gz
+python ansatzfitting.py -f labeled.tar.gz
+python train_final_model.py labeled.tar.gz
 ```
 
 ### Full Usage Example with unzipped files
@@ -43,9 +43,9 @@ python train_final_model.py input_data_labelled
 conda activate nwf-stretch
 
 python download_data.py
-python feature_generation.py -f data_labeled.tar.gz
-python ansatzfitting.py -f data_labeled.tar.gz
-python train_final_model.py data_labeled.tar.gz
+python feature_generation.py -f labeled.tar.gz
+python ansatzfitting.py -f labeled.tar.gz
+python train_validate.py labeled.tar.gz unlabeled.tar.gz -f -p
 ```
 
 ## Detailed Description of Individual Steps
@@ -57,8 +57,8 @@ Folder: (some toy data is included in this git repository, without the need to d
 ```python feature_generation.py input_data_labelled```
 
 File:
-```python feature_generation.py -f nonwoven-fiber-graphs_labeled.tar.gz```
-```python feature_generation.py -f nonwoven-fiber-graphs_unlabeled.tar.gz```
+```python feature_generation.py -f labeled.tar.gz```
+```python feature_generation.py -f unlabeled.tar.gz```
 
 
 Results are placed in ```features/``` with a subfolder corresponding to the folder/filename. 
@@ -71,8 +71,8 @@ Folder:
 ```python ansatzfitting.py input_data_labelled```
 
 File:
-```python ansatzfitting.py -f nonwoven-fiber-graphs_labeled.tar.gz```
-```python ansatzfitting.py -f nonwoven-fiber-graphs_unlabeled.tar.gz```
+```python ansatzfitting.py -f labeled.tar.gz```
+```python ansatzfitting.py -f unlabeled.tar.gz```
 
 Results are placed in ```polyfit/``` with a subfolder corresponding to the folder/filename. 
 !!! Please note, only folders/files in the base directory of this repository work. Please consider creating a symlink if you have to store the data somewhere else !!! 
@@ -91,6 +91,9 @@ You can activate plotting with the "-p" flag:
 
 Plots are placed in the folder "visuals".
 
+To run the function on zipped input, call
+
+```python train_validate.py labeled.tar.gz unlabeled.tar.gz -f -p```
 
 
 ### Training final model
@@ -100,3 +103,7 @@ Train linear regression models for predicting alpha and beta respectively.
 ```python train_final_model.py input_data_labelled``` 
 
 Results are placed in ```trained_models``` as pickled scikit-learn models.
+
+!!! Note that even for zipped input data the call for this step does not include the ```-f``` flag, i.e. you should call
+
+```python train_final_model.py labeled.tar.gz```
