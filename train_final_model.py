@@ -38,10 +38,9 @@ def readGraphFeatures(folder):
         li.append(data)
         
     # Combine into dataframe and return
-    data_graph = pd.concat(li, axis=0, ignore_index=False)
+    data_graph = pd.concat(li, axis = 0, ignore_index = False)
     data_graph.index = data_graph.index.str.replace("_Microstructure.graphml", "")
-    data_graph.index = data_graph.index.str.replace(folder, '')
-    data_graph.index = data_graph.index.str.replace("\\",'')
+    data_graph.index = data_graph.index.map(reduceFilePath)
     data_graph = data_graph.sort_index()
 	
     print(f"LOG: data_graph:")
@@ -69,8 +68,7 @@ def readStretchFeatures(folder):
     # Combine into dataframe and return
     data_stretch = pd.concat(li, axis=0, ignore_index=False)
     data_stretch.index = data_stretch.index.str.replace("_Microstructure.graphml", "")
-    data_stretch.index = data_graph.index.str.replace(folder, '')
-    data_stretch.index = data_graph.index.str.replace("\\",'')
+    data_stretch.index = data_stretch.index.map(reduceFilePath)
     data_stretch = data_stretch.sort_index()
 	
     print(f"LOG: data_stretch:")
