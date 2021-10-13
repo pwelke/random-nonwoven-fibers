@@ -1,5 +1,5 @@
 # random-nonwoven-fibers
-Code for the paper "Graph-Based Tensile Strength Approximation of Random Nonwoven Materials by Interpretable Regression"
+Code for the paper "Graph-Based Tensile Strength Approximation of Random Nonwoven Materials by Interpretable Regression" by Dario Antweiler, Marc Harmening, Nicole Marheineke, Andre  Schmeißer, Raimund Wegener, and Pascal Welke.
 
 
 ## Dependencies
@@ -18,16 +18,37 @@ In particular
 - ```unlabeled.tar.gz``` contains 739 graphs in GML format without corresponding strain/stress curves.
 
 ## Usage
+
 ### Full Usage Example with zipped files
-- ```python feature_generation.py -f toy_data_labeled.tar.gz```
-- ```python ansatzfitting.py -f toy_data_labeled.tar.gz```
-- ```python train_final_model.py toy_data_labeled.tar.gz```
+```
+conda activate nwf-stretch
+
+python download_data.py
+python feature_generation.py -f data_labeled.tar.gz
+python ansatzfitting.py -f data_labeled.tar.gz
+python train_final_model.py data_labeled.tar.gz
+```
 
 ### Full Usage Example with unzipped files
-- ```python feature_generation.py input_data_labelled```
-- ```python ansatzfitting.py input_data_labelled```
-- ```python train_final_model.py input_data_labelled```
+```
+conda activate nwf-stretch
 
+python feature_generation.py input_data_labelled
+python ansatzfitting.py input_data_labelled
+python train_final_model.py input_data_labelled
+```
+
+### Full Reproduction of Results in the Paper
+```
+conda activate nwf-stretch
+
+python download_data.py
+python feature_generation.py -f data_labeled.tar.gz
+python ansatzfitting.py -f data_labeled.tar.gz
+python train_final_model.py data_labeled.tar.gz
+```
+
+## Detailed Description of Individual Steps
 
 ### Feature generation
 Calculate graph and stretch features for a set of graphml files from a folder or a gzipped file:
