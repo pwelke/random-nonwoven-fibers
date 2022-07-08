@@ -10,8 +10,8 @@ from networkx.algorithms import bipartite
 
 # Plotting
 import matplotlib.pyplot as plt
-from ipywidgets import interact, fixed
-from IPython.display import display, HTML
+#from ipywidgets import interact, fixed
+#from IPython.display import display, HTML
 
 # Convenient helpers
 import csv
@@ -26,6 +26,8 @@ from sklearn.preprocessing import minmax_scale
 
 from os import listdir
 from os.path import isfile, join
+
+import fileutil
 
 # Printing libraries and settings
 # import warnings; warnings.filterwarnings('ignore')
@@ -271,7 +273,12 @@ def compute_standard_graph_features(filename, file=None):
 
 	""" Export to csv """
 	(pd.DataFrame.from_dict(data=results, orient='index')
-	   .to_csv(f'features/{filename}_graph.csv', header=list(results[next(iter(results))].keys())))
+	#    .to_csv(f'../results/features/{filename}_graph.csv', header=list(results[next(iter(results))].keys())))
+	.to_csv(fileutil.featurefolder(f'{filename}_graph.csv'), header=list(results[next(iter(results))].keys())))
+
+	## CodeOcean
+	#(pd.DataFrame.from_dict(data=results, orient='index')
+	#   .to_csv(f'../results/features/{filename}_graph.csv', header=list(results[next(iter(results))].keys())))
 	   
 
 if __name__ == "__main__":

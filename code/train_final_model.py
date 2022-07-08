@@ -7,8 +7,8 @@ from os import listdir, remove
 import os.path
 from os.path import isfile, join, splitext
 from os import listdir
-from os.path import isfile, join
 import sys
+from genericpath import exists
 
 # Persistance
 import pickle
@@ -31,7 +31,10 @@ def readGraphFeatures(folder):
     Reads in calculated graph features placed in 'folder'
     """
     # Get all the filenames in the directory
-    path = join("features", folder)
+    #path = join("features", folder)
+
+    path = folder.replace("results/", "results/features/")
+
     files = [f for f in listdir(path) if isfile(join(path, f)) and "_graph" in f]
     
     # Creat empty list
@@ -56,7 +59,8 @@ def readStretchFeatures(folder):
     Reads in calculated stretch features placed in 'folder'
     """
     # Get all the filenames in the directory
-    path = join("features", folder)
+    #path = join("features", folder)
+    path = folder.replace("results/", "results/features/")
     files = [f for f in listdir(path) if isfile(join(path, f)) and "_stretch" in f]
     
     # Creat empty list
@@ -81,6 +85,7 @@ def readPolyfitTargets(path):
     Reads in alpha, beta targets based on the ansatzfitting from 'path'
     """
     # Get all the filenames in the directory
+    path = path.replace("../results", "")
     files = [f for f in listdir(path) if isfile(join(path, f)) and "_polyfit" in f]
     
     # Creat empty list
@@ -178,15 +183,24 @@ if __name__ == "__main__":
 	final_linreg_alpha, final_linreg_beta = trainFinalModel(data_joined, features = features)
 	
 	# Serialization
-	filename = 'trained_models/pickle_final_linreg_alpha'
-	outfile = open(filename,'wb')
-	pickle.dump(final_linreg_alpha,outfile)
-	outfile.close()
+	if not exists('../results/trained_models'):
+		makedirs('../results/trained_models')
+
+	filename = '../results/trained_models/pickle_final_linreg_alpha'
+	with open(f'{filename}.pkl', 'wb') as f:
+		pickle.dump(final_linreg_alpha, f)
+
+	#outfile = open(filename,'wb')
+	#pickle.dump(final_linreg_alpha,outfile)
+	#outfile.close()
 	
-	filename = 'trained_models/pickle_final_linreg_beta'
-	outfile = open(filename,'wb')
-	pickle.dump(final_linreg_beta,outfile)
-	outfile.close()
+	filename = '../results/trained_models/pickle_final_linreg_beta'
+	with open(f'{filename}.pkl', 'wb') as f:
+		pickle.dump(final_linreg_beta, f)
+
+	#outfile = open(filename,'wb')
+	#pickle.dump(final_linreg_beta,outfile)
+	#outfile.close()
 	
 	print("Done training models!")
 	

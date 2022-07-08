@@ -48,18 +48,25 @@ if __name__ == "__main__":
 		folder = sys.argv[2]
 	else:
 		zipping = False
+		
+	# new because of structure change
+	folder_source = folder.replace("../data/", "")
+	folder_source = folder.replace("../results/", "")
+
+	print(f"Folder source: {folder_source}")
 
 	# create output folder if necessary
-	if not exists(join('polyfit', folder)):
-		mkdir(join('polyfit', folder))
+	if not exists(join('polyfit', folder_source)):
+		mkdir(join('polyfit', folder_source))
 
 	if zipping:
 		with tarfile.open(folder, 'r:*') as tarredfiles:
 			for tarinfo in tarredfiles:
 				if tarinfo.isreg() and "StressStrainCurve.csv" in tarinfo.name:
 					tarredfiles.extract(tarinfo)
-					fit_ansatz_function(join(folder, tarinfo.name), tarinfo.name)
+					fit_ansatz_function(join(folder_source, tarinfo.name), tarinfo.name)
 					remove(tarinfo.name)
+		print("Done!")
 	else:
 		# Get all files from that folder
 		files = [f for f in listdir(folder) if isfile(
@@ -68,5 +75,5 @@ if __name__ == "__main__":
 		print(f"Folder = {folder} with {len(files)} Files")
 
 		for file in files:
-			fit_ansatz_function(join(folder, file), join(folder, file))
+			fit_ansatz_function(join(folder_source, file), join(folder, file))
 		print("Done!")

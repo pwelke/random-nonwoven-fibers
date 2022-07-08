@@ -17,13 +17,16 @@ import pandas as pd
 from tqdm import tqdm
 from datetime import date
 
+import fileutil
+
 def load_graph(file: str, verbose: bool=True):
     ''' Load a graph, enforce that it is a multigraph and run some initial checks and statistics.
     Note that networkx has different edge access api depending on whether the graph is a multigraph or not.
     Not enforcing multigraph results in strange errors for graphs that happen to have at most one edge / fiber
     between all vertices.'''
 
-    G = nx.read_graphml(file, force_multigraph=True)
+    #G = nx.read_graphml(file, force_multigraph=True)
+    G = nx.read_graphml(join("../results/", file), force_multigraph=True)
 
     if verbose:
         print('n', G.number_of_nodes())
@@ -371,7 +374,9 @@ def compute_stretch_graph_features(filename, file):
             columns.append(f"stretch_diff_{pre}_{factor}")
 
     result_df.columns = columns
-    result_df.to_csv(f"features/{filename}_stretch.csv")
+    result_df.to_csv(fileutil.featurefolder(f"{filename}_stretch.csv"))
+    ## CodeOcean
+    #result_df.to_csv(f"../results/features/{filename}_stretch.csv")
 
 
 if __name__ == "__main__":

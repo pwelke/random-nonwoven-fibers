@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+set -ex
+
+
+
+# Set the variable "generate_data" to "all" to generate all fiber graph data sets, which will take longer to complete.
+# If set to "single", only a single graph is generated along with pre-computed graphs. 
+# The default for the reproducible run uses the setting "none", which uses the provided data only.
+# The ML training is always performed on all available data sets.
+generate_data="none"
+
+if [ $generate_data == "all" ] ; then
+   bash ./run_computation.sh all
+elif [ $generate_data == "single" ] ; then
+   bash ./run_computation.sh single
+else
+   bash ./run_computation.sh none
+fi

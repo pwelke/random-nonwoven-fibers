@@ -1,0 +1,28 @@
+metadata_version: 1
+name: Machine Learning Framework to predict Nonwoven Material Properties from Fiber
+  Graph Representations
+description: Machine Learning Framework to predict Nonwoven Material Properties from
+  Fiber Graph Representations
+tags:
+- Machine Learning
+- Nonwoven
+- Regression
+authors:
+- name: Dario Antweiler
+  affiliations:
+  - name: Fraunhofer IAIS
+- name: Marc Harmening
+  affiliations:
+  - name: Universität Trier
+- name: Nicole Marheineke
+  affiliations:
+  - name: Universität Trier
+- name: Andre Schmeißer
+  affiliations:
+  - name: Fraunhofer ITWM
+- name: Raimund Wegener
+  affiliations:
+  - name: Fraunhofer ITWM
+- name: Pascal Welke
+  affiliations:
+  - name: Universität Bonn

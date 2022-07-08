@@ -30,6 +30,11 @@ from sklearn.linear_model import LinearRegression, Lasso
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
+
+import fileutil
+
 ## Helper functions
 # Ansatz function
 def f(x, a, b):
@@ -48,7 +53,7 @@ def readGraphFeatures(folder):
     """
 
     # Get all the filenames in the directory
-    path = join("features", folder)
+    path = join(fileutil.featurefolder(folder))
     files = [f for f in listdir(path) if isfile(join(path, f)) and "_graph" in f]
     
     # Creat empty list
@@ -63,7 +68,13 @@ def readGraphFeatures(folder):
     # Combine into dataframe and return
     data_graph = pd.concat(li, axis = 0, ignore_index = False)
     data_graph.index = data_graph.index.str.replace("_Microstructure.graphml", "")
+    
     data_graph.index = data_graph.index.map(reduceFilePath)
+
+    ## new because of file structure
+    data_graph.index = data_graph.index.str.replace(folder, "")
+    #data_graph.index = data_graph.index.map(lambda x: str(x)[1:])
+
     data_graph = data_graph.sort_index()
     
     return data_graph
@@ -74,7 +85,7 @@ def readStretchFeatures(folder):
     """
 
     # Get all the filenames in the directory
-    path = join("features", folder)
+    path = fileutil.featurefolder(folder)
     files = [f for f in listdir(path) if isfile(join(path, f)) and "_stretch" in f]
     
     # Creat empty list
@@ -136,6 +147,9 @@ def combineInputData(data_graph, data_stretch, data_polyfit, deduplicate = True)
     # Remove duplicated entries
     if deduplicate:
         data_joined = data_joined[data_joined.duplicated() == False]
+
+    #print("LOG: End of function combineInputData, data_joined:")
+    #print(data_joined)
 	
     return data_joined
 	
@@ -145,7 +159,7 @@ def readGraphOnlyData(folder):
     """
 
     # Get all the filenames in the directory
-    path = join("features", folder)
+    path = fileutil.featurefolder(folder)
     files = [f for f in listdir(path) if isfile(join(path, f)) and "_graph" in f]
     
     li = []
@@ -292,6 +306,10 @@ def train(data_joined, df_graphonly):
 					#print(f"LOG: Train: {len(train_data)} in {len(train_para_combs)} combs, Test: {len(test_data)}")
 
 				# Split feature data from labels
+				print(f"LOG: Train: {len(train_data)} in {len(train_para_combs)} combs, Test: {len(test_data)}")
+				#print("data_joined")
+				#print(data_joined)
+
 				X_train = train_data[feature_combs[feature_comb]]
 				y_train_alpha = train_data['alpha']
 				y_train_beta = train_data['beta']
@@ -316,6 +334,15 @@ def train(data_joined, df_graphonly):
 					reg_alpha = Lasso(alpha = 0.005).fit(X_train_scaled, y_train_alpha)
 					reg_beta = Lasso(alpha = 0.005).fit(X_train_scaled, y_train_beta)
 				else:
+					#print(f"X_train_scaled: {len(X_train_scaled)}")
+					#print(f"y_train_alpha: {len(y_train_alpha)}")
+					#print(f"y_train_beta: {len(y_train_beta)}")
+					#print("X_train_scaled")
+					#print(X_train_scaled)
+					#print("y_train_alpha")
+					#print(y_train_alpha)
+					#print("y_train_beta")
+					#print(y_train_beta)
 					reg_alpha = LinearRegression().fit(X_train_scaled, y_train_alpha)
 					reg_beta = LinearRegression().fit(X_train_scaled, y_train_beta)
 
@@ -416,6 +443,7 @@ def take_closest(myList, myNumber):
        return after
     else:
        return before
+	   
        
 def resampleCurve(curve, n_base_points = 1000):
     """
@@ -446,8 +474,9 @@ def getResamplesOrigPredCurves(folder, df_predictions, test_data, zipped = False
         # Working with tar-files
         if zipped:
             
-            tarfile_path = "toy_data_labeled.tar.gz"
-			
+            tarfile_path = "../data/toy_data_labeled.tar.gz"
+            #print(f"my_file_path: {my_file_path}\n tarfile_path: {tarfile_path}")
+
             with tarfile.open(tarfile_path, 'r:*') as tarredfiles:
                 for tarinfo in tarredfiles:
                     if tarinfo.isreg():
@@ -467,7 +496,8 @@ def getResamplesOrigPredCurves(folder, df_predictions, test_data, zipped = False
                             remove(tarinfo.name)
         
         else:
-            my_file = Path(f"{my_file_path}_StressStrainCurve.csv")
+            my_file = Path(f"../results/{my_file_path}_StressStrainCurve.csv")
+            #print(f"LOG: my_file: {my_file}")
             if my_file.is_file():
             	df_original = pd.read_csv(my_file, index_col = 0)
 
@@ -663,6 +693,14 @@ if __name__ == "__main__":
     # Read in arguments from command line
     folder = sys.argv[1]
     folder_graphonly = sys.argv[2]
+
+    # new because of structure change
+    folder_source = folder.replace("../data/", "")
+    folder_source = folder.replace("../results/", "")
+    folder_graphonly_source = folder_graphonly.replace("../data/", "")
+    folder_graphonly_source = folder_graphonly.replace("../results/", "")
+
+    print(f"LOG: folder_source: {folder_source}, folder_graphonly_source: {folder_graphonly_source}")
     
     # Get full command-line arguments
     full_cmd_arguments = sys.argv
@@ -686,12 +724,18 @@ if __name__ == "__main__":
             zipped = True
     
     # Read data in
-    data_graph = readGraphFeatures(folder)
-    data_stretch = readStretchFeatures(folder)
-    polyfit_path = join("polyfit", folder)
+    data_graph = readGraphFeatures(folder_source)
+    #print("data_graph.head()")
+    #print(data_graph.head())
+    data_stretch = readStretchFeatures(folder_source)
+    #print("data_stretch.head()")
+    #print(data_stretch.head())
+    polyfit_path = join("polyfit", folder_source)
     data_polyfit = readPolyfitTargets(polyfit_path)
+    #print("data_polyfit.head()")
+    #print(data_polyfit.head())
     data_joined = combineInputData(data_graph, data_stretch, data_polyfit, deduplicate = True)
-    data_graphonly = readGraphOnlyData(folder_graphonly)
+    data_graphonly = readGraphOnlyData(folder_graphonly_source)
     
     # Features
     features = 'graph+stretch'
@@ -709,11 +753,11 @@ if __name__ == "__main__":
     
     # Train the models
     predictions = train(data_joined, data_graphonly)
-    print("Done training models!")
+    print("LOG: Done training models!")
 
     # Validate the trained models
-    validate(folder, predictions, data_graphonly, plot = plot, zipped = zipped)
-    print("Done validating models!")
+    validate(folder_source, predictions, data_graphonly, plot = plot, zipped = zipped)
+    print("LOG: Done validating models!")
     
     #final_linreg_alpha, final_linreg_beta = trainFinalModel(data_joined, features = features)
     
