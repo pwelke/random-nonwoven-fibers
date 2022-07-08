@@ -1,23 +1,62 @@
 # random-nonwoven-fibers
-Code for the paper "Graph-Based Tensile Strength Approximation of Random Nonwoven Materials by Interpretable Regression" by Dario Antweiler, Marc Harmening, Nicole Marheineke, Andre  Schmeißer, Raimund Wegener, and Pascal Welke.
+Code for the paper "Graph-Based Tensile Strength Approximation of Random Nonwoven Materials by Interpretable Regression" by Dario Antweiler, Marc Harmening, Nicole Marheineke, Andre Schmeißer, Raimund Wegener, and Pascal Welke.
 
 
 ## Dependencies
-All packages that we depend on are listed in ```environment.yaml```. 
+
+The current version of the code expects to run in a docker container. A docker file is provided in ```/environment/Dockerfile```.
+
+The fiber __graph generation__ and subsequent stress-strain curve __simulation__ are written in Matlab and hence require a recent Matlab version (and license).
+
+The __surrogate model__ training, evaluation, and application are written in Python.
+All python packages that we depend on are listed in ```environment.yaml```. 
 You may create a virtual environment e.g. using [anaconda](https://anaconda.org) via the command
 
 ```conda env create -n nwf-stretch -f environment.yaml```
 
 After activating the environment, you can follow the steps below.
 
-## Dataset
-You may download the datasets used for our experiments using ```download_data.py```. 
+
+## Complete Run of the Whole Pipeline
+The entry point of the full pipeline is the bash script ```/code/run```.
+The script expects to be run in a docker container in the absolute path ```/code/run```.
+You can choose, by setting the parameter within ```/code/run``` how much generation and simulation you want to run by setting the ```generate_data``` variable. By default, ```generate_data="none"```.
+
+You can choose from the following parameters:
+
+#### ```all```
+Create a dataset similar to the one used in 
+
+Antweiler, Harmening, Marheineke, Schmeißer, Wegener, Welke (2022):
+
+Graph-Based Tensile Strength Approximation of Random Nonwoven Materials by Interpretable Regression.
+
+Machine Learning with Applications (8), Elsevier.
+
+https://doi.org/10.1016/j.mlwa.2022.100288 
+
+Generate 25 graphs each for 
+  - 5 random parameter combinations and simulate stress-strain curves for all 25 graphs
+  - 50 random parameter combinations and simulate only one stress-strain curve 
+
+#### ```single```
+A 'short' example run that generates a single graph and simulates its stress-strain curve
+(takes roughly 30h on current CodeOcean instances)
+Note that this setting is just to showcase that everything works in time that a free-tier CodeOcean user has. 
+It should not be used to train any production model.
+
+
+#### ```none```
+No graph is generated, only the few graphs that are already in the repository are used for a very small training run.
+
+
+## Existing Dataset
+If graph generation and subsequent stress-strain curve simulation takes too long, or you want to reproduce the results reported in our paper, you may download the datasets used for our experiments using ```download_data.py```. 
 It downloads two (large) archives to the base folder of the repository.
 In particular
 - ```labeled.tar.gz``` contains 295 graphs in GML format and 295 corresponding CSV files containing the strain/stress curves of the corresponding samples (as computed by an ordinary differential equation solver) 
 - ```unlabeled.tar.gz``` contains 739 graphs in GML format without corresponding strain/stress curves.
 
-## Usage
 
 ### Full Usage Example with zipped files
 ```

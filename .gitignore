@@ -1,3 +1,4 @@
 ./features/
 ./trained_models/
 ./polyfit/
+__pycache__
