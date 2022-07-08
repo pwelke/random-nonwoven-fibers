@@ -155,3 +155,11 @@ Results are placed in ```/results/trained_models``` as pickled scikit-learn mode
 !!! Note that even for zipped input data the call for this step does not include the ```-f``` flag, i.e. you should call
 
 ```python train_final_model.py /results/labeled.tar.gz```
+
+### Making predictions
+
+Using the trained models to predict alpha and beta from graph samples.
+
+```predict.py trained_models/pickle_final_linreg_alpha trained_models/pickle_final_linreg_beta input_data_graphonly```
+
+Results are placed in ```/results/predictions/input_data_graphonly```
